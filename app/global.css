@@ -1,0 +1,63 @@
+@import 'tailwindcss';
+@import './sokosumi-theme.css';
+@import 'fumadocs-ui/css/preset.css';
+@import 'fumadocs-openapi/css/preset.css';
+
+/* Search field hover - blue-violet border, transparent background */
+.hover\:bg-fd-accent:hover {
+  background-color: transparent !important;
+  border-color: #6F6AF8 !important;
+}
+
+.hover\:text-fd-accent-foreground:hover {
+  color: inherit !important;
+}
+
+/* Dropdown menu selected item icon color in light theme */
+[data-state="open"] [data-highlighted] svg,
+[aria-selected="true"] svg,
+.bg-fd-accent svg {
+  color: #1c193d !important; /* deep indigo for light theme */
+}
+
+.dark [data-state="open"] [data-highlighted] svg,
+.dark [aria-selected="true"] svg,
+.dark .bg-fd-accent svg {
+  color: #edebf6 !important; /* soft white for dark theme */
+}
+
+/* Remove grid from sidebar */
+#nd-sidebar {
+  background: #f4f2f9 !important;
+}
+
+.dark #nd-sidebar {
+  background: var(--color-fd-background) !important;
+}
+
+/* Use blue-violet for links and interactive text in dark mode */
+.dark a:not([class*="bg-"]):not([class*="text-fd-muted"]) {
+  color: #709bff !important;
+}
+
+/* items change color on hover in dark mode */
+.dark a:not([class*="bg-"]):not([class*="text-fd-muted"]):not([aria-selected="true"]):not([data-active="true"]):hover {
+  color: #6F6AF8 !important;
+}
+
+/* Active/selected items in dark mode */
+.dark [data-active="true"],
+.dark [aria-selected="true"]:not([class*="bg-"]) {
+  color: #B8A7F9 !important;
+}
+
+/* Code syntax highlighting - make keywords blue-violet in dark mode */
+.dark .hljs-keyword,
+.dark .hljs-built_in {
+  color: #6F6AF8 !important;
+}
+
+/* Focus ring for interactive elements */
+:focus-visible {
+  outline-color: #6F6AF8 !important;
+}

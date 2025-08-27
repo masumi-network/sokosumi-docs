@@ -1,0 +1,78 @@
+@theme {
+  /* Primary Blue-Violet */
+  --color-fd-primary: #7A0FF8;
+  --color-fd-primary-foreground: #ff;
+
+  /* Accent: Soft Lavender */
+  --color-fd-accent: #B8A7F9;
+  --color-fd-accent-foreground: #fff;
+
+  /* Secondary: Pale Blue */
+  --color-fd-secondary: #E2E5FA;
+  --color-fd-secondary-foreground: #363795;
+
+  /* Background: Light Lavender */
+  --color-fd-background: #FAF8FF;
+  --color-fd-foreground: #072347; /* h2 and text */
+
+  /* Card/Surface */
+  --color-fd-card: #F7F6FD;
+  --color-fd-card-foreground: #272356;
+
+  /* Popover */
+  --color-fd-popover: #ECE9FA;
+  --color-fd-popover-foreground: #272356;
+
+  /* Muted */
+  --color-fd-muted: #EAE8F6;
+  --color-fd-muted-foreground: #7C7F99;
+
+  /* Border */
+  --color-fd-border: #E6D4EA;
+  --color-fd-ring: #6F6AF8;
+}
+
+.dark {
+  /* Primary Blue-Violet */
+  --color-fd-primary: #413dcd;
+  --color-fd-primary-foreground: #fff;
+
+  /* Accent: Soft Lavender */
+  --color-fd-accent: #B8A7F9;
+  --color-fd-accent-foreground: #fff;
+
+  /* Secondary: Deep Indigo */
+  --color-fd-secondary: #232346;
+  --color-fd-secondary-foreground: #B8A7F9;
+
+  /* Background: Near-black, hint of blue */
+  --color-fd-background: #101021; /* much darker, very subtle blue tone */
+  --color-fd-foreground: #ECE9FA;
+
+  /* Card/Surface */
+  --color-fd-card: #181832;
+  --color-fd-card-foreground: #ECE9FA;
+
+  /* Popover */
+  --color-fd-popover: #181832;
+  --color-fd-popover-foreground: #ECE9FA;
+
+  /* Muted */
+  --color-fd-muted: #181832;
+  --color-fd-muted-foreground: #e2ddf5;
+
+  /* Border */
+  --color-fd-border: #232346;
+  --color-fd-ring: #6F6AF8;
+}
+
+/* Sidebar specific colors */
+#nd-sidebar {
+  --color-fd-secondary: #E0E5FA;
+  --color-fd-muted: #EAE8F6;
+}
+
+.dark #nd-sidebar {
+  --color-fd-secondary: #181832;
+  --color-fd-muted: #181832;
+}
