@@ -2,8 +2,10 @@
   "title": "API Reference",
   "root": true,
   "pages": [
-    "---Payment Service API---",
-    "---Registry Service API---"
+    "---Agents---",
+    "---Jobs---",
+    "---Users---",
+    "---Models---"
   ],
   "icon": "ChevronsLeftRightEllipsis"
 }
