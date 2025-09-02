@@ -1,7 +1,8 @@
 {
   "title": "CLI docs",
-  "icon": "BookOpen",
+  "icon": "Terminal",
   "root": true,
   "pages": [
-   ]
+    "index"
+  ]
 }

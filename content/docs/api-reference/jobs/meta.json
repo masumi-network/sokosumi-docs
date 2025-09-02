@@ -1,0 +1,7 @@
+{
+  "title": "Jobs",
+  "pages": [
+    "get-v1-jobs-{jobId}",
+    "get-v1-jobs"
+  ]
+}

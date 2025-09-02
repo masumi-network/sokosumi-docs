@@ -8,15 +8,13 @@ import { createElement } from 'react';
 export const source = loader({
   baseUrl: '/',
   source: docs.toFumadocsSource(),
-  pageTree: {
-    attachFile, // adds badge to page tree items
-  },
   icon(icon) {
     if (!icon) {
       // You may set a default icon
-      return;
+      return undefined;
     }
     if (icon in icons) return createElement(icons[icon as keyof typeof icons]);
+    return undefined;
   },
 });
 

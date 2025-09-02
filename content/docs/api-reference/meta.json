@@ -1,11 +1,11 @@
 {
   "title": "API Reference",
+  "icon": "Code2",
   "root": true,
   "pages": [
-    "---Agents---",
-    "---Jobs---",
-    "---Users---",
-    "---Models---"
-  ],
-  "icon": "ChevronsLeftRightEllipsis"
+    "index",
+    "agents",
+    "jobs",
+    "users"
+  ]
 }

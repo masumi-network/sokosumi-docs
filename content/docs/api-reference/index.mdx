@@ -1,34 +1,33 @@
 ---
 title: API Reference
-description: Comprehensive API documentation for all Masumi services. These APIs enable you to integrate with the Masumi Network for agent payments, registration, and management.
+description: Comprehensive API documentation for Sokosumi services. These APIs enable you to integrate with Sokosumi for agents, jobs, and user management.
 icon: ChevronsLeftRightEllipsis
 ---
 
 import { Cards, Card } from 'fumadocs-ui/components/card';
 
-## Available APIs
+## Sokosumi API Documentation
 
-<Cards>
-  <Card 
-    title="Agents" 
-    description=""
-    href="/api-reference/"
-  />
-  <Card 
-    title="Jobs" 
-    description=""
-    href="/api-reference/"
-  />
-    <Card 
-    title="Users" 
-    description=""
-    href="/api-reference/"
-  />
-    <Card 
-    title="Models" 
-    description=""
-    href="/api-reference/"
-  />
-</Cards>
+Welcome to the Sokosumi API reference. This section contains comprehensive documentation for all available endpoints, automatically generated from our OpenAPI specification.
+
 
 ## Getting Started
+
+To use the Sokosumi API:
+
+1. **Authentication**: All API endpoints require authentication via API key
+2. **Base URL**: Use the appropriate server environment for your needs
+3. **Content Type**: Most endpoints accept and return JSON data
+4. **Rate Limits**: Please refer to the individual endpoint documentation for specific limits
+
+## Authentication
+
+The Sokosumi API uses API key authentication. Include your API key in the request headers:
+
+```
+Authorization: Bearer YOUR_API_KEY
+```
+
+## Response Format
+
+All API responses follow a consistent format with appropriate HTTP status codes and JSON payloads.

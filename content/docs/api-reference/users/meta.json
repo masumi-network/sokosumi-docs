@@ -1,0 +1,8 @@
+{
+  "title": "Users",
+  "pages": [
+    "get-v1-users-me",
+    "patch-v1-users-me",
+    "put-v1-users-me"
+  ]
+}
