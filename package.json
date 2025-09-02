@@ -3,17 +3,16 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "node scripts/generate-openapi.mjs && node scripts/fetch-readme.mjs && next build",
+    "build": "node scripts/generate-openapi.mjs && next build",
     "dev": "next dev",
     "start": "next start",
-    "postinstall": "fumadocs-mdx",
-    "fetch-readme": "node scripts/fetch-readme.ts"
+    "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
     "@theguild/remark-mermaid": "^0.3.0",
-    "fumadocs-core": "^15.5.2",
+    "fumadocs-core": "^15.7.8",
     "fumadocs-openapi": "^9.3.4",
-    "fumadocs-ui": "15.5.2",
+    "fumadocs-ui": "^15.7.8",
     "lucide-react": "^0.525.0",
     "mermaid": "^11.8.1",
     "next": "15.3.3",
@@ -36,6 +35,7 @@
     "rimraf": "^6.0.1",
     "tailwindcss": "^4.1.10",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.5",
     "typescript": "^5.8.3"
   }
 }
