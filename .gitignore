@@ -5,8 +5,7 @@
 .contentlayer
 .content-collections
 .source
-content/docs/api-reference/(generated)/
-**/_*.mdx
+content/docs/api-reference/*/**/*.mdx
 # synced images from repos
 public/synced-images/
 
