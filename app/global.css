@@ -37,27 +37,27 @@
 
 /* Use blue-violet for links and interactive text in dark mode */
 .dark a:not([class*="bg-"]):not([class*="text-fd-muted"]) {
-  color: #709bff !important;
+  color: #7367d1 !important;
 }
 
 /* items change color on hover in dark mode */
 .dark a:not([class*="bg-"]):not([class*="text-fd-muted"]):not([aria-selected="true"]):not([data-active="true"]):hover {
-  color: #6F6AF8 !important;
+  color: #a077ec !important;
 }
 
 /* Active/selected items in dark mode */
 .dark [data-active="true"],
 .dark [aria-selected="true"]:not([class*="bg-"]) {
-  color: #B8A7F9 !important;
+  color: #a391ea !important;
 }
 
 /* Code syntax highlighting - make keywords blue-violet in dark mode */
 .dark .hljs-keyword,
 .dark .hljs-built_in {
-  color: #6F6AF8 !important;
+  color: #956af8 !important;
 }
 
 /* Focus ring for interactive elements */
 :focus-visible {
-  outline-color: #6F6AF8 !important;
+  outline-color: #896af8 !important;
 }

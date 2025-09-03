@@ -34,7 +34,7 @@
 
 .dark {
   /* Primary Blue-Violet */
-  --color-fd-primary: #413dcd;
+  --color-fd-primary: #6d3dcd;
   --color-fd-primary-foreground: #fff;
 
   /* Accent: Soft Lavender */
@@ -42,7 +42,7 @@
   --color-fd-accent-foreground: #fff;
 
   /* Secondary: Deep Indigo */
-  --color-fd-secondary: #232346;
+  --color-fd-secondary: #37285f;
   --color-fd-secondary-foreground: #B8A7F9;
 
   /* Background: Near-black, hint of blue */
