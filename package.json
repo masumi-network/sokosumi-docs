@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "node scripts/generate-openapi.mjs && next build",
+    "build": "node scripts/generate-openapi.mjs && node scripts/generate-cli-docs.mjs && next build",
     "dev": "next dev",
     "start": "next start",
     "postinstall": "fumadocs-mdx"
