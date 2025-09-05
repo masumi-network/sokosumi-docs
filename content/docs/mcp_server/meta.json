@@ -1,8 +1,0 @@
-{
-  "title": "MCP Server",
-  "icon": "Server",
-  "root": true,
-  "pages": [
-    "index"
-  ]
-}
