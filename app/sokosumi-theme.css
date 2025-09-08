@@ -1,11 +1,11 @@
 @theme {
   /* Primary Blue-Violet */
-  --color-fd-primary: #7A0FF8;
-  --color-fd-primary-foreground: #ff;
+  --color-fd-primary: #7A0FF8; /* send-button (CLI) */
+  --color-fd-primary-foreground: #fff;  /* send-button text */
 
   /* Accent: Soft Lavender */
-  --color-fd-accent: #B8A7F9;
-  --color-fd-accent-foreground: #fff;
+  --color-fd-accent: #9D85FF; /* hover sidebar unselected */
+  --color-fd-accent-foreground: #fffff; /* hover sidebar unselected text */
 
   /* Secondary: Pale Blue */
   --color-fd-secondary: #E2E5FA;
