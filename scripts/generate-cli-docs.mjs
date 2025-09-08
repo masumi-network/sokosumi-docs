@@ -21,8 +21,7 @@ async function generateCliDocs() {
     
     // Create MDX file with frontmatter and README content
     const mdxContent = `---
-title: CLI Documentation
-description: Sokosumi CLI tool documentation
+title: Sokosumi CLI
 ---
 
 ${readmeContent}
