@@ -3,7 +3,6 @@
   "icon": "BookOpen",
   "root": true,
   "pages": [
-    "---Get Started---",
     "index"
    ]
 }
