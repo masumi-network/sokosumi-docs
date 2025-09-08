@@ -1,6 +1,6 @@
 {
   "title": "Sokosumi CLI",
-  "icon": "Terminal",
+  "icon": "FileTerminal",
   "root": true,
   "pages": [
     "index"
