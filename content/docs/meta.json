@@ -4,6 +4,7 @@
   "pages": [
     "documentation",
     "api-reference",
-    "cli_docs"
+    "cli_docs",
+    "mcp"
   ]
 }

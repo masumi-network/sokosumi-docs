@@ -6,6 +6,9 @@
 .content-collections
 .source
 content/docs/api-reference/*/**/*.mdx
+content/docs/mcp/*.mdx
+content/docs/mcp/images/
+content/docs/cli_docs/images/
 # synced images from repos
 public/synced-images/
 

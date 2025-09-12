@@ -1,4 +1,4 @@
-import { writeFileSync } from 'fs';
+import { writeFileSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
 
 /**
@@ -75,10 +75,14 @@ export async function fetchAllImages(readmeContent, baseUrl, outputDir) {
 
   console.log(`🖼️  Found ${images.length} image(s) to fetch`);
   
+  // Create images directory
+  const imagesDir = join(outputDir, 'images');
+  mkdirSync(imagesDir, { recursive: true });
+  
   for (const image of images) {
     const imageUrl = image.src.startsWith('http') ? image.src : `${baseUrl}/${image.src}`;
     const filename = image.src.split('/').pop();
-    const outputPath = join(outputDir, filename);
+    const outputPath = join(imagesDir, filename);
     
     try {
       await fetchImage(imageUrl, outputPath);
