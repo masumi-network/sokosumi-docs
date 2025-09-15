@@ -22,6 +22,7 @@ async function generateCliDocs() {
     // Create MDX file with frontmatter and README content
     const mdxContent = `---
 title: Sokosumi CLI
+banner: /assets/sokosumi_banner_cli_tool.png
 icon: FileTerminal
 ---
 

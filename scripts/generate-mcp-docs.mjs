@@ -38,6 +38,7 @@ async function generateMcpDocs() {
     // Create index.mdx (main page)
     const indexContent = `---
 title: Sokosumi MCP Server
+banner: /assets/sokosumi_banner_mcp_server.png
 ---
 
 ${readmeContent}
