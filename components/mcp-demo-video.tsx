@@ -1,30 +1,79 @@
-"use client"
-import { useRef } from 'react';
+"use client";
 
-export default function MCPDemoVideo() {
-  const videoRef = useRef<HTMLVideoElement>(null);
+import React, { useState } from "react";
 
-  const handleToggle = () => {
-    const vid = videoRef.current;
-    if (vid) {
-      if (vid.paused) {
-        vid.play();
-      } else {
-        vid.pause();
-      }
-    }
-  };
+interface MCPDemoVideoProps {
+  src: string;
+  poster?: string;
+  className?: string;
+}
+
+export function MCPDemoVideo({ 
+  src, 
+  poster, 
+  className = "" 
+}: MCPDemoVideoProps) {
+  const [hasError, setHasError] = useState(false);
 
   return (
-    <div>
-      <video
-        ref={videoRef}
-        src="/assets/mcp-setup-demo.mp4"
-        style={{ width: '100%', maxWidth: '600px', cursor: 'pointer' }}
-        onClick={handleToggle}
-        loop
-        playsInline
-      />
+    <div className={`relative w-full my-6 ${className}`} style={{ position: 'relative', zIndex: 1 }}>
+
+      
+      <div style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent' }}>
+        
+        {hasError && (
+          <div className="absolute inset-0 flex items-center justify-center bg-fd-card z-[2]" style={{ borderRadius: '0.6rem' }}>
+            <div className="text-center p-4">
+              <p className="text-fd-muted-foreground mb-2">Failed to load video</p>
+              <button
+                onClick={() => {
+                  setHasError(false);
+                  // Force video reload
+                  const video = document.querySelector('video');
+                  if (video) {
+                    video.load();
+                  }
+                }}
+                className="px-3 py-1.5 text-sm bg-fd-primary text-fd-primary-foreground rounded-md hover:opacity-90 transition-opacity"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        )}
+
+        <video
+          className="w-full"
+          controls
+          controlsList="nodownload noplaybackrate noremoteplayback"
+          disablePictureInPicture
+          autoPlay
+          loop
+          muted
+          playsInline
+          poster={poster}
+          onError={(e) => {
+            console.error('Video error:', e);
+            setHasError(true);
+          }}
+          onAbort={() => {
+            setHasError(true);
+          }}
+          style={{
+            width: "100%",
+            height: "auto",
+            backgroundColor: "#000",
+            display: "block",
+            borderRadius: "0.6rem",
+            boxShadow: "0 5px 18px -2px rgba(0, 0, 0, 0.1), 0 5px 2px -5px rgba(0, 0, 0, 0.04)"
+          }}
+        >            
+        <source src={src} type="video/mp4" />
+          Your browser does not support the video tag.
+        </video>
+      </div>
     </div>
   );
 }
+
+export default MCPDemoVideo;

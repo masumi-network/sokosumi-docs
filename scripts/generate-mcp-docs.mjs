@@ -26,7 +26,7 @@ async function generateMcpDocs() {
       console.warn(`⚠️  DEBUG_CONNECTION.md not found: ${error.message}`);
     }
     
-    // Fetch images from README
+    /*/ Fetch images from README
     await fetchAllImages(readmeContent, baseUrl, outputDir);
     
     // Update image paths in README content to point to images/ folder
@@ -34,6 +34,7 @@ async function generateMcpDocs() {
       const filename = src.split('/').pop();
       return `![${alt}](./images/${filename})`;
     });
+    */
     
     // Create index.mdx (main page)
     const indexContent = `---
