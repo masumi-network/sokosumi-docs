@@ -9,7 +9,7 @@ async function generateMcpDocs() {
   try {
     console.log('🚀 Generating MCP documentation...');
 
-    const baseUrl = 'https://raw.githubusercontent.com/masumi-network/Sokosumi-MCP/feature/mcp-video';
+    const baseUrl = 'https://raw.githubusercontent.com/masumi-network/Sokosumi-MCP/main';
     const outputDir = './content/docs/mcp';
     
     // Ensure directory exists
