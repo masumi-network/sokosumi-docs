@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 
 interface MCPDemoVideoProps {
   src: string;
@@ -14,11 +14,10 @@ export function MCPDemoVideo({
   className = "" 
 }: MCPDemoVideoProps) {
   const [hasError, setHasError] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   return (
     <div className={`relative w-full my-6 ${className}`} style={{ position: 'relative', zIndex: 1 }}>
-
-      
       <div style={{ backgroundColor: 'transparent' }}>
         
         {hasError && (
@@ -28,10 +27,8 @@ export function MCPDemoVideo({
               <button
                 onClick={() => {
                   setHasError(false);
-                  // Force video reload
-                  const video = document.querySelector('video');
-                  if (video) {
-                    video.load();
+                  if (videoRef.current) {
+                    videoRef.current.load();
                   }
                 }}
                 className="px-3 py-1.5 text-sm bg-fd-primary text-fd-primary-foreground rounded-md hover:opacity-90 transition-opacity"
@@ -43,6 +40,7 @@ export function MCPDemoVideo({
         )}
 
         <video
+          ref={videoRef}
           className="w-full"
           controls
           controlsList="nodownload noplaybackrate noremoteplayback"
