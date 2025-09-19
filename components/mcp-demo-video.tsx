@@ -19,7 +19,7 @@ export function MCPDemoVideo({
     <div className={`relative w-full my-6 ${className}`} style={{ position: 'relative', zIndex: 1 }}>
 
       
-      <div style={{ position: 'relative', zIndex: 1, backgroundColor: 'transparent' }}>
+      <div style={{ backgroundColor: 'transparent' }}>
         
         {hasError && (
           <div className="absolute inset-0 flex items-center justify-center bg-fd-card z-[2]" style={{ borderRadius: '0.6rem' }}>
