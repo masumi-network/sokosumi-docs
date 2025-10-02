@@ -9,6 +9,7 @@
   border-color: #6F6AF8 !important;
 }
 
+/* Hover linkbox -> changes text inside to this color */
 .hover\:text-fd-accent-foreground:hover {
   color: inherit !important;
 }
@@ -35,7 +36,7 @@
   background: var(--color-fd-background) !important;
 }
 
-/* Use blue-violet for links and interactive text in dark mode */
+/* Blue-violet for link-text and interactive text in dark mode */
 .dark a:not([class*="bg-"]):not([class*="text-fd-muted"]) {
   color: #7367d1 !important;
 }
@@ -45,7 +46,7 @@
   color: #a077ec !important;
 }
 
-/* Active/selected items in dark mode */
+/* Active/selected items in dark mode - sidebar*/
 .dark [data-active="true"],
 .dark [aria-selected="true"]:not([class*="bg-"]) {
   color: #a391ea !important;

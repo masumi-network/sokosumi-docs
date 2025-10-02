@@ -1,19 +1,21 @@
 @theme {
   /* Primary Blue-Violet */
-  --color-fd-primary: #7A0FF8; /* send-button (CLI) */
-  --color-fd-primary-foreground: #fff;  /* send-button text */
+  --color-fd-primary: #7A0FF8; /* selected page text+background (sidebar), send-button, link-underline */
+  --color-fd-primary-foreground: #fff;  /* send-button text (CLI) */
 
   /* Accent: Soft Lavender */
-  --color-fd-accent: #9D85FF; /* hover sidebar unselected */
+  --color-fd-accent: #bba2ff; /* hover sidebar unselected, selected mode background, hover next page box */
   --color-fd-accent-foreground: #fffff; /* hover sidebar unselected text */
 
-  /* Secondary: Pale Blue */
+  /* Search bar background: Pale Blue */
   --color-fd-secondary: #E2E5FA;
+  /* Page name text by smaller page size */
   --color-fd-secondary-foreground: #363795;
 
-  /* Background: Light Lavender */
+  /* Main Background: Light Lavender */
   --color-fd-background: #FAF8FF;
-  --color-fd-foreground: #072347; /* h2 and text */
+  /* Main text: h2 and text */
+  --color-fd-foreground: #072347; 
 
   /* Card/Surface */
   --color-fd-card: #F7F6FD;
@@ -25,7 +27,8 @@
 
   /* Muted */
   --color-fd-muted: #EAE8F6;
-  --color-fd-muted-foreground: #7C7F99;
+  /* number, bulltepoints, link-text, icons */
+  --color-fd-muted-foreground: #6b6e85;
 
   /* Border */
   --color-fd-border: #E6D4EA;
