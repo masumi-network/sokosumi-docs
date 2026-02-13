@@ -3,6 +3,17 @@
   "pages": [
     "get-v1-users-me",
     "patch-v1-users-me",
-    "put-v1-users-me"
+    "put-v1-users-me",
+    "users/me/attachments/get",
+    "users/me/credits/get",
+    "users/me/get",
+    "users/me/onboarding/get",
+    "users/me/onboarding/post",
+    "users/me/organizations/get",
+    "users/me/organizations/id/credits/get",
+    "users/me/organizations/id/get",
+    "users/me/preferences/get",
+    "users/me/preferences/patch",
+    "users/registered/get"
   ]
 }

@@ -1,9 +1,14 @@
 {
   "title": "Agents",
   "pages": [
+    "agents/get",
+    "agents/id/get",
+    "agents/id/input-schema/get",
+    "agents/id/jobs/get",
+    "agents/id/jobs/post",
+    "get-v1-agents",
     "get-v1-agents-{agentId}-input-schema",
     "get-v1-agents-{agentId}-jobs",
-    "get-v1-agents",
     "post-v1-agents-{agentId}-jobs"
   ]
 }

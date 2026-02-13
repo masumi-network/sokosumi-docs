@@ -1,0 +1,10 @@
+{
+  "title": "Coworkers",
+  "pages": [
+    "coworkers/get",
+    "coworkers/id/get",
+    "coworkers/me/events/get",
+    "coworkers/me/get",
+    "coworkers/me/usage/post"
+  ]
+}
