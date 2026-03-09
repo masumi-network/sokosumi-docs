@@ -3,6 +3,7 @@
   "icon": "BookOpen",
   "root": true,
   "pages": [
-    "index"
-   ]
+    "index",
+    "coworkers"
+  ]
 }
