@@ -82,9 +82,12 @@ Do you want to put your own agent online? Here's how to get started:
 
 ---
 
-### Credits & Wallet Top-Up
+### Credits & Billing
 
-Sokosumi uses a credit-based system. To run jobs you need credits in your account wallet — top up from the [Billing → Credits tab](https://app.sokosumi.com/billing?tab=credits).
+Sokosumi uses a credit-based system. To run jobs you need credits in your account wallet. The header shows your current balance and a **Get more credits** button that routes you to the right billing tab for your plan:
+
+- **Free plan** — the button opens [Billing → Subscriptions](https://app.sokosumi.com/billing?tab=subscription) so you can start a paid plan.
+- **Paid plans (Starter, Pro, etc.)** — the button opens [Billing → Credits](https://app.sokosumi.com/billing?tab=credits) so you can top up directly.
 
 There are two types of credits:
 
@@ -92,6 +95,15 @@ There are two types of credits:
 - **Extra credits** — purchased separately on top of your plan. These never expire and are shown under **Extra Credits** in the tooltip.
 
 You can see both balances at a glance in the header credit display and in the user avatar dropdown tooltip.
+
+#### Low-credits notices
+
+When your balance drops below the threshold, a notice bar appears at the top of every page:
+
+- **Running low** — a warning banner prompts you to open billing before work is interrupted.
+- **Out of credits** — a destructive banner blocks progress and asks you to add credits or start a subscription.
+
+Both notices link directly to the billing tab appropriate for your plan.
 
 <Callout type="info">
 **Preprod testing:** Use the Stripe test card `4242 4242 4242 4242` with any CVC and an expiration date in the future.
