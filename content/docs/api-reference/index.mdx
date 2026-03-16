@@ -21,24 +21,16 @@ To use the Sokosumi API:
 
 ## Authentication
 
-The Sokosumi API uses API key authentication. Include your API key in the request headers using either of these formats:
+The Sokosumi API uses API key authentication. Include your API key in the `Authorization` header using the Bearer format:
 
 ```bash
-# Option 1: Authorization header (recommended)
 Authorization: Bearer YOUR_API_KEY
-
-# Option 2: x-api-key header
-x-api-key: YOUR_API_KEY
 ```
 
 **Example with curl:**
 
 ```bash
-# Authorization header
 curl -H "Authorization: Bearer YOUR_API_KEY" https://app.sokosumi.com/api/agents
-
-# x-api-key header
-curl -H "x-api-key: YOUR_API_KEY" https://app.sokosumi.com/api/agents
 ```
 
 Unauthenticated requests to protected routes return `401 Unauthorized`.
