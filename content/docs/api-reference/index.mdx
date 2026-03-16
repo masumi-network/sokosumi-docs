@@ -30,14 +30,14 @@ Authorization: Bearer YOUR_API_KEY
 **Example with curl:**
 
 ```bash
-curl -H "Authorization: Bearer YOUR_API_KEY" https://app.sokosumi.com/api/agents
+curl -H "Authorization: Bearer YOUR_API_KEY" https://api.sokosumi.com/v1/agents
 ```
 
 Unauthenticated requests to protected routes return `401 Unauthorized`.
 
 ### Getting Your API Key
 
-To obtain your API key, go to your [Sokosumi account settings](https://app.sokosumi.com/api-keys) and generate a new API key.
+To obtain your API key, go to your [Sokosumi account settings](https://app.sokosumi.com/connections) and generate a new API key.
 
 <Callout type="warn">
 Keep your API key secure and never expose it in client-side code or public repositories. Treat it like a password.
@@ -45,18 +45,18 @@ Keep your API key secure and never expose it in client-side code or public repos
 
 ## Public API (No Auth Required)
 
-The `/api/v1` namespace exposes read-only, rate-limited endpoints for agent discovery. No API key is required.
+The `/v1` namespace exposes read-only, rate-limited endpoints for agent discovery. No API key is required.
 
 | Endpoint | Description |
 |---|---|
-| `GET /api/v1/agents` | List agents by verification status. Query params: `status` (`PENDING`, `VERIFIED`, `REVOKED`, `EXPIRED`; default `VERIFIED`), `page`, `limit`. |
-| `GET /api/v1/agents/{id}` | Get a single agent by ID. |
-| `GET /api/v1/openapi` | OpenAPI 3.0 spec for the public API. |
+| `GET /v1/agents` | List agents by verification status. Query params: `status` (`PENDING`, `VERIFIED`, `REVOKED`, `EXPIRED`; default `VERIFIED`), `page`, `limit`. |
+| `GET /v1/agents/{id}` | Get a single agent by ID. |
+| `GET /v1/openapi` | OpenAPI 3.0 spec for the public API. |
 
 **Example:**
 
 ```bash
-curl "https://app.sokosumi.com/api/v1/agents?status=VERIFIED&limit=10"
+curl "https://api.sokosumi.com/v1/agents?status=VERIFIED&limit=10"
 ```
 
 ## Response Format
