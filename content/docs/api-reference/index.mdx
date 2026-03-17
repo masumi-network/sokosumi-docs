@@ -49,7 +49,7 @@ The `/v1` namespace exposes read-only, rate-limited endpoints for agent discover
 
 | Endpoint | Description |
 |---|---|
-| `GET /v1/agents` | List agents by verification status. Query params: `status` (`PENDING`, `VERIFIED`, `REVOKED`, `EXPIRED`; default `VERIFIED`), `page`, `limit`. |
+| `GET /v1/agents` | List agents by verification status. Query params: `status` (`PENDING`, `VERIFIED`, `REVOKED`, `EXPIRED`; default `VERIFIED`), `category` (filter by category slug; use `uncategorized` for agents with no category; multiple values match any), `page`, `limit`. |
 | `GET /v1/agents/{id}` | Get a single agent by ID. |
 | `GET /v1/openapi` | OpenAPI 3.0 spec for the public API. |
 
@@ -57,6 +57,12 @@ The `/v1` namespace exposes read-only, rate-limited endpoints for agent discover
 
 ```bash
 curl "https://api.sokosumi.com/v1/agents?status=VERIFIED&limit=10"
+```
+
+**Example with category filter:**
+
+```bash
+curl "https://api.sokosumi.com/v1/agents?category=research&category=uncategorized"
 ```
 
 ## Response Format

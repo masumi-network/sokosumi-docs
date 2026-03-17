@@ -1,12 +1,13 @@
 {
   "title": "Users",
   "pages": [
-    "get-v1-users-me",
-    "patch-v1-users-me",
-    "put-v1-users-me",
-    "users/me/attachments/get",
+    "users/magic-link/post",
     "users/me/credits/get",
+    "users/me/files/get",
+    "users/me/files/post",
     "users/me/get",
+    "users/me/notices/id/acknowledge/post",
+    "users/me/notices/pending/get",
     "users/me/onboarding/get",
     "users/me/onboarding/post",
     "users/me/organizations/get",

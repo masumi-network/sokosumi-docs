@@ -5,9 +5,11 @@
   "pages": [
     "index",
     "agents",
+    "categories",
     "conversations",
     "coworkers",
     "jobs",
+    "organizations",
     "tasks",
     "users"
   ]

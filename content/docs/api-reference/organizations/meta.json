@@ -1,0 +1,7 @@
+{
+  "title": "Organizations",
+  "pages": [
+    "organizations/id/get",
+    "organizations/id/logo/put"
+  ]
+}
