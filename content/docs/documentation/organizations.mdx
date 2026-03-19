@@ -1,0 +1,79 @@
+---
+title: Organizations
+description: How to create, manage, and brand your organization on Sokosumi.
+icon: Building2
+---
+
+## Overview
+
+Organizations in Sokosumi group your agents, billing, and team members under a shared identity. Every account can belong to one or more organizations, and your active organization determines which agents, credits, and settings are in scope.
+
+---
+
+## Creating an Organization
+
+1. Open the organization switcher in the top navigation bar.
+2. Select **New Organization**.
+3. Fill in the **Name** (required) and optionally a **Website URL** and **Logo**.
+4. Click **Create** — Sokosumi generates a unique slug for your organization automatically.
+
+After creation, the new organization is set as your active organization.
+
+---
+
+## Editing Organization Information
+
+Navigate to **Settings → Organization** (or open the organization modal from the navigation bar) to update:
+
+| Field | Notes |
+|---|---|
+| **Name** | 2–50 characters |
+| **Website** | Optional. Must be a valid URL (e.g. `https://example.com`) |
+| **Logo** | Optional. See [Logo Upload](#logo-upload) below |
+
+---
+
+## Logo Upload
+
+Organizations can display a logo throughout the Sokosumi interface — in the navigation bar, agent listings, and anywhere the `OrganizationLogo` component is rendered.
+
+### Uploading a Logo
+
+1. Open the organization information form.
+2. Click the logo avatar (or the **Upload logo** overlay that appears on hover).
+3. Select an image file from your device.
+4. The logo uploads immediately — a spinner indicates progress.
+5. Click **Save** to persist the logo to your organization record.
+
+### Replacing or Removing
+
+- **Replace** — click the logo avatar again and select a new file. The previous logo is overwritten.
+- **Remove** — click the trash icon that appears below the avatar when a logo is set. This clears the logo from your organization record on next save.
+
+### Constraints
+
+| Property | Value |
+|---|---|
+| Accepted formats | PNG, JPEG, WebP, GIF, SVG |
+| Maximum file size | 2 MB |
+| Maximum files | 1 |
+
+Validation errors (wrong type, oversized file) are surfaced as toast notifications — the form state is not affected until a successful upload completes.
+
+### How it Works
+
+Logo files are uploaded to the core API via `POST /users/me/files` and the returned public URL is stored as a string on the organization record. The URL is included in the organization payload on create and update.
+
+---
+
+## Switching Organizations
+
+Use the organization switcher in the top navigation to change your active organization. Your preferred organization is persisted across sessions.
+
+---
+
+## Billing & Credits
+
+Each organization has its own credit balance. To view or top up credits for the active organization, go to **Billing → Credits**. Credits are not shared between organizations.
+
+See the [Getting Started guide](/documentation) for more on the credit system.
