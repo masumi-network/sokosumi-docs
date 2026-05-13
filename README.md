@@ -3,6 +3,8 @@
 This is a Next.js application generated with
 [Create Fumadocs](https://github.com/fuma-nama/fumadocs).
 
+API reference pages under `content/docs/api-reference/**` are generated from the live OpenAPI spec (`scripts/generate-openapi.mjs`). On a fresh clone, `npm run dev` runs that generator once when needed (requires network) so `/api-reference` and sections such as Projects resolve correctly.
+
 Run development server:
 
 ```bash
