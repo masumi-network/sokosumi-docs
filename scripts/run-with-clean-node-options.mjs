@@ -1,11 +1,13 @@
 /**
  * Next.js SSR expects either no `globalThis.localStorage` or a real Storage API.
- * Node can install a broken `localStorage` when `NODE_OPTIONS` contains
- * `--localstorage-file` without a valid path, which yields
- * `TypeError: localStorage.getItem is not a function` during `next dev` / build.
  *
- * This wrapper strips that flag for the child process and fixes the current process
- * before spawning Next.
+ * Node.js v25+ exposes experimental Web Storage by default. Without a valid
+ * `--localstorage-file`, `localStorage` can exist with a broken surface
+ * (`getItem` not a function), which breaks Next during SSR.
+ *
+ * This wrapper:
+ * - strips `--localstorage-file` / `--webstorage` style flags from NODE_OPTIONS
+ * - always passes `--no-experimental-webstorage` to the Next child (argv + NODE_OPTIONS)
  */
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -13,6 +15,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
+
+const DISABLE_WEBSTORAGE = '--no-experimental-webstorage';
 
 /** @param {string | undefined} raw */
 function cleanNodeOptionsString(raw) {
@@ -29,6 +33,8 @@ function cleanNodeOptionsString(raw) {
       continue;
     }
     if (t.startsWith('--localstorage-file=')) continue;
+    if (t === '--webstorage' || t === '--experimental-webstorage') continue;
+    if (t === DISABLE_WEBSTORAGE) continue;
     out.push(t);
   }
   return out.length ? out.join(' ') : undefined;
@@ -45,15 +51,17 @@ function removeBrokenGlobalLocalStorage() {
   }
 }
 
-const cleanedNodeOptions = cleanNodeOptionsString(process.env.NODE_OPTIONS);
+const cleanedRest = cleanNodeOptionsString(process.env.NODE_OPTIONS);
 removeBrokenGlobalLocalStorage();
 
-const childEnv = { ...process.env };
-if (cleanedNodeOptions === undefined) delete childEnv.NODE_OPTIONS;
-else childEnv.NODE_OPTIONS = cleanedNodeOptions;
+const childNodeOptions = cleanedRest
+  ? `${DISABLE_WEBSTORAGE} ${cleanedRest}`
+  : DISABLE_WEBSTORAGE;
 
-if (cleanedNodeOptions === undefined) delete process.env.NODE_OPTIONS;
-else process.env.NODE_OPTIONS = cleanedNodeOptions;
+const childEnv = { ...process.env, NODE_OPTIONS: childNodeOptions };
+
+process.env.NODE_OPTIONS = childNodeOptions;
+removeBrokenGlobalLocalStorage();
 
 const forward = process.argv.slice(2);
 if (forward[0] !== 'next' || forward.length < 2) {
@@ -69,11 +77,15 @@ if (!fs.existsSync(nextBin)) {
   process.exit(1);
 }
 
-const child = spawn(process.execPath, [nextBin, ...forward.slice(1)], {
-  cwd: root,
-  stdio: 'inherit',
-  env: childEnv,
-});
+const child = spawn(
+  process.execPath,
+  [DISABLE_WEBSTORAGE, nextBin, ...forward.slice(1)],
+  {
+    cwd: root,
+    stdio: 'inherit',
+    env: childEnv,
+  },
+);
 
 child.on('exit', (code, signal) => {
   if (signal) process.kill(process.pid, signal);
