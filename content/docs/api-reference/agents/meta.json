@@ -5,6 +5,7 @@
     "agents/id/get",
     "agents/id/input-schema/get",
     "agents/id/jobs/get",
-    "agents/id/jobs/post"
+    "agents/id/jobs/post",
+    "agents/id/reviews/get"
   ]
 }
