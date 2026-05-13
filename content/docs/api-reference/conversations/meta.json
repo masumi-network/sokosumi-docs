@@ -4,8 +4,8 @@
     "conversations/get",
     "conversations/id/archive/patch",
     "conversations/id/get",
-    "conversations/id/items/get",
-    "conversations/id/items/post",
+    "conversations/id/messages/get",
+    "conversations/id/messages/post",
     "conversations/id/patch",
     "conversations/post"
   ]

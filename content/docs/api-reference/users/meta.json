@@ -1,20 +1,18 @@
 {
   "title": "Users",
   "pages": [
-    "users/magic-link/post",
-    "users/me/credits/get",
-    "users/me/files/get",
-    "users/me/files/post",
-    "users/me/get",
-    "users/me/notices/id/acknowledge/post",
-    "users/me/notices/pending/get",
-    "users/me/onboarding/get",
-    "users/me/onboarding/post",
-    "users/me/organizations/get",
-    "users/me/organizations/id/credits/get",
-    "users/me/organizations/id/get",
-    "users/me/preferences/get",
-    "users/me/preferences/patch",
+    "users/id/credits/get",
+    "users/id/get",
+    "users/id/notices/noticeid/acknowledge/post",
+    "users/id/notices/pending/get",
+    "users/id/onboarding/get",
+    "users/id/onboarding/post",
+    "users/id/organizations/get",
+    "users/id/organizations/organizationid/credits/get",
+    "users/id/preferences/get",
+    "users/id/preferences/patch",
+    "users/id/uploads/get",
+    "users/id/uploads/post",
     "users/registered/get"
   ]
 }

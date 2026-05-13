@@ -7,6 +7,11 @@
     "jobs/id/get",
     "jobs/id/input-request/get",
     "jobs/id/inputs/post",
-    "jobs/id/links/get"
+    "jobs/id/links/get",
+    "jobs/id/patch",
+    "jobs/id/refund/post",
+    "jobs/id/share/delete",
+    "jobs/id/share/put",
+    "jobs/id/workspace/put"
   ]
 }
