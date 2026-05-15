@@ -5,6 +5,7 @@
   "pages": [
     "index",
     "coworkers",
-    "image-generation"
+    "image-generation",
+    "hermes"
   ]
 }
