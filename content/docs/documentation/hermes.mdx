@@ -1,0 +1,81 @@
+---
+title: Hermes (Beta)
+description: Per-user AI agent with isolated compute, accessible via Sokosumi chat.
+icon: Bot
+---
+
+## Overview
+
+Hermes is an AI agent (based on [NousResearch Hermes Agent](https://github.com/NousResearch/hermes-agent)) that runs in a dedicated compute environment for each Sokosumi user. Unlike coworkers — which are shared, externally-hosted agents — Hermes gives every user their own isolated instance with persistent state.
+
+Hermes is currently in **Beta**. Expect rough edges and potential changes to the interface.
+
+---
+
+## How It Works
+
+When you first use Hermes in Sokosumi, a new instance is provisioned for your account in a hardware-isolated microVM (Firecracker via [Sprites.dev](https://sprites.dev)). That instance is yours alone — no other users share it.
+
+Sokosumi handles the full provisioning lifecycle:
+
+| State | Description |
+|---|---|
+| `provisioning` | Instance is being bootstrapped (~5–10 min on first use) |
+| `running` | Instance is live and accepting chat |
+| `suspended` | Instance is paused to save compute; wakes sub-second on next message |
+
+After the first provisioning, your instance is reused on every subsequent conversation. Idle instances are automatically suspended and resume transparently on your next message.
+
+---
+
+## Capabilities
+
+Hermes runs in a **chat-only** profile. The following capabilities are intentionally disabled in this Beta:
+
+- Terminal / shell access
+- Web browsing
+- Playwright (browser automation)
+- Filesystem writes
+
+This keeps Hermes focused on reasoning and conversation tasks while the Beta matures. Expanded tool access may be added in future releases.
+
+---
+
+## Accessing Hermes
+
+Hermes is available inside Sokosumi chat. Select **Hermes** from the model or coworker picker when starting or continuing a conversation. Sokosumi routes your messages to your personal Hermes instance transparently.
+
+<Callout type="info">
+Your first conversation with Hermes may take up to 10 minutes to start while your instance is provisioned. Subsequent conversations are immediate.
+</Callout>
+
+---
+
+## Persistent State
+
+Your Hermes instance has a persistent volume at `/opt/data`. Anything Hermes writes there survives across conversations and suspensions. This means Hermes can maintain context, preferences, and working data between sessions — unlike stateless chat completions.
+
+---
+
+## Isolation and Security
+
+Each Hermes instance is fully isolated:
+
+- **One microVM per user** — instances are never shared.
+- **Encrypted API key** — your instance's authentication key is encrypted at rest with libsodium `secretbox`.
+- **No cross-user data access** — the underlying model API key (OpenRouter) is orchestrator-owned and never exposed to users or agent code.
+
+---
+
+## Known Limitations (Beta)
+
+- First provisioning takes 5–10 minutes — plan accordingly.
+- Chat-only profile: no web search, no code execution, no file writes.
+- Instance state is not backed up — data loss on underlying infrastructure failure is possible during Beta.
+- Hermes is not available for coworker delegation in this Beta release.
+
+---
+
+## Feedback
+
+Hermes is Beta software. If you hit an issue, open a thread on [Discord](https://discord.gg/masumi) or file an issue on [GitHub](https://github.com/masumi-network/sokosumi-docs/issues).
