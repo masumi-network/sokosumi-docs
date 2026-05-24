@@ -1,12 +1,12 @@
 ---
 title: Hermes (Beta)
-description: Per-user AI agent with isolated compute, accessible via Sokosumi chat.
+description: Per-user AI agent with isolated compute, Composio integrations, and configurable autonomy.
 icon: Bot
 ---
 
 ## Overview
 
-Hermes is an AI agent (based on [NousResearch Hermes Agent](https://github.com/NousResearch/hermes-agent)) that runs in a dedicated compute environment for each Sokosumi user. Unlike coworkers — which are shared, externally-hosted agents — Hermes gives every user their own isolated instance with persistent state.
+Hermes is an AI agent (based on [NousResearch Hermes Agent](https://github.com/NousResearch/hermes-agent)) that runs in a dedicated compute environment for each Sokosumi user. Unlike coworkers — which are shared, externally-hosted agents — Hermes gives every user their own isolated instance with persistent state, configurable autonomy, and the ability to connect external tools via Composio.
 
 Hermes is currently in **Beta**. Expect rough edges and potential changes to the interface.
 
@@ -28,6 +28,55 @@ After the first provisioning, your instance is reused on every subsequent conver
 
 ---
 
+## Onboarding
+
+When you first set up Hermes, you'll be walked through a multi-step onboarding flow. You can provide:
+
+- **Role** — your job title or function (e.g. "Product Manager", "Software Engineer")
+- **Company** — your organization name
+
+These are threaded into Hermes' system prompt so the agent can tailor responses to your context without you needing to repeat it each session.
+
+You can update your role and company at any time from your Hermes settings.
+
+---
+
+## Autonomy Levels
+
+Hermes supports configurable autonomy levels that control how proactively it acts on your behalf:
+
+| Level | Behavior |
+|---|---|
+| **Medium** | Hermes always calls tools when they are available — it acts rather than narrates. Recommended for most users. |
+| **High** | Hermes takes broader initiative, chaining multiple tool calls and making more decisions autonomously before checking in. |
+
+At **medium** autonomy, Hermes is instructed to always invoke the appropriate tool rather than describing what it would do. This is the default.
+
+At **high** autonomy, Hermes is more agentic — it will make sequences of tool calls to complete a goal and only surfaces blockers to you.
+
+<Callout type="info">
+Autonomy level affects both the agent's behavior and how costs are accounted — higher autonomy typically means more tool calls and higher credit usage per session.
+</Callout>
+
+---
+
+## Composio Integrations
+
+Hermes can connect to external services through [Composio](https://composio.dev) — a tool integration platform. Once connected, Hermes can use those services as tools inside your chat.
+
+To connect an integration:
+1. Open your Hermes settings in Sokosumi
+2. Navigate to **Integrations**
+3. Select a service and complete the OAuth or API key flow
+
+Connected services become available as tools Hermes can call during your conversations.
+
+<Callout type="warn">
+If a connected service returns a 4xx or 5xx error, Hermes will surface the error directly — it will not silently report the request as "deferred" or "pending".
+</Callout>
+
+---
+
 ## Capabilities
 
 Hermes runs in a **chat-only** profile. The following capabilities are intentionally disabled in this Beta:
@@ -37,7 +86,15 @@ Hermes runs in a **chat-only** profile. The following capabilities are intention
 - Playwright (browser automation)
 - Filesystem writes
 
-This keeps Hermes focused on reasoning and conversation tasks while the Beta matures. Expanded tool access may be added in future releases.
+External capabilities (web search, API calls, etc.) can be added through Composio integrations. Native tool access may expand in future Beta releases.
+
+---
+
+## Hermes as Task Executor
+
+Hermes can be assigned tasks from your Sokosumi personal task board. When a task is assigned to Hermes, it picks it up and works through it autonomously, updating task status as it progresses.
+
+This allows you to queue work for Hermes without being in an active chat session.
 
 ---
 
@@ -70,9 +127,10 @@ Each Hermes instance is fully isolated:
 ## Known Limitations (Beta)
 
 - First provisioning takes 5–10 minutes — plan accordingly.
-- Chat-only profile: no web search, no code execution, no file writes.
+- Chat-only profile by default: no web search, no code execution, no file writes (add capabilities via Composio).
 - Instance state is not backed up — data loss on underlying infrastructure failure is possible during Beta.
-- Hermes is not available for coworker delegation in this Beta release.
+- Cron-based task firing mirrors to Sokosumi tasks on preprod only (not yet on mainnet).
+- Hermes coworker delegation is not available in this Beta release.
 
 ---
 
