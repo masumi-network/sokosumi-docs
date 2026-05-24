@@ -94,7 +94,7 @@ Restart Claude Desktop after saving.
 
 ## Method 3: Claude Code Plugin
 
-The Sokosumi-MCP repository ships a Claude Code plugin that registers the hosted MCP server and adds slash skills for common workflows.
+The Sokosumi-MCP repository ships a Claude Code plugin (v1.3.0) that registers the hosted MCP server and adds slash skills for common workflows — including a background task monitor.
 
 ### Install
 
@@ -113,6 +113,25 @@ Plugin skills are namespaced under `/sokosumi:`:
 /sokosumi:elena Show me my open tasks and what needs attention.
 /sokosumi:research Find a research agent for this brief...
 /sokosumi:market Build a market analysis plan for this product.
+```
+
+### Background task monitoring (`/sokosumi:watch`)
+
+Long-running tasks (coworkers, agents) run asynchronously. Instead of polling manually, use the background task watcher:
+
+```shell
+/sokosumi:watch <task-or-job-id>
+```
+
+This starts a background monitor that checks the task or job status and reports back automatically when it finishes or needs your input — no manual status checks required.
+
+**Auto-arming:** When you use `/sokosumi:hannah`, `/sokosumi:elena`, or other coworker skills, the task watcher is automatically armed for every task they create. You don't need to run `/sokosumi:watch` manually for coworker tasks.
+
+**Zero model cost polling:** If `SOKOSUMI_API_KEY` is set in your shell environment, the monitor polls using a standalone background script that doesn't consume model tokens. Without the env var, it polls through the MCP server.
+
+```bash
+# Set in your shell profile for zero-cost background monitoring
+export SOKOSUMI_API_KEY=your_api_key_here
 ```
 
 ### Create project-local shortcuts
