@@ -1,6 +1,7 @@
 ---
 title: Organization Management
-icon: Users
+description: Invite members (including bulk invite), roles, and Enterprise organization billing.
+icon: Building2
 ---
 
 ## Overview
@@ -19,15 +20,15 @@ From **Organization → Members**, click **Invite member**, enter a single email
 
 For onboarding multiple teammates at once, click **Bulk invite** (next to **Invite member**) and paste a list of email addresses into the text area. Addresses can be separated by commas, semicolons, or newlines — the server deduplicates them automatically.
 
-After submission, each email is processed independently. You'll see a per-address result summary showing which invitations succeeded and which failed (e.g. already a member, invitation limit reached, or invalid address).
+After submission, each email is processed independently. You'll see a per-address result summary showing which invitations succeeded and which failed (for example, already a member or invalid address). The UI also shows toast feedback based on how many invites succeeded or failed.
 
 <Callout type="info">
-Bulk invites respect your plan's invitation limit (`BETTER_AUTH_ORG_INVITATION_LIMIT`). If the limit is reached mid-batch, already-processed addresses are sent; remaining addresses fail with a limit-exceeded error.
+Each bulk invite accepts a limited number of addresses per submission. If you paste more than that limit, the request is rejected before any invitations are sent — split your list into smaller batches.
 </Callout>
 
-### Invitation Limits
+### Invitation limits
 
-Invitation limits are enforced at the plan level. If you need to invite more members than your current limit allows, upgrade your plan or contact [info@sokosumi.com](mailto:info@sokosumi.com) for Enterprise arrangements.
+There is a maximum number of email addresses per bulk invite. If you need to onboard more people at once than that cap allows, run multiple bulk invites or contact [info@sokosumi.com](mailto:info@sokosumi.com) for Enterprise arrangements.
 
 ---
 
@@ -37,8 +38,8 @@ Enterprise organizations have custom seat and credit allocations negotiated dire
 
 **What changes on Enterprise:**
 
-- The **Billing → Credits** tab no longer shows the Stripe balance portal link. Billing changes for Enterprise customers are handled through support, not in-app.
-- The organization billing page shows a dedicated Enterprise card with your seat count and active member count.
+- On the **billing** page, the Stripe balance portal link is hidden when your active plan is Enterprise (this applies even if you have a Stripe customer on file). Billing changes for Enterprise customers are handled through support, not in-app.
+- For organization billing, the **Subscription** tab shows a dedicated Enterprise card with your seat count and active member count instead of self-serve plan controls.
 - Plan and seat changes require a support request — they cannot be made through the self-serve UI.
 
 <Callout type="warn">
@@ -59,5 +60,5 @@ If you're an Enterprise customer and expect to manage billing through the Stripe
 
 ## Related
 
-- [Credits & Billing](/documentation) — credit types, plan differences, low-balance notices
+- [Credits & Billing](/documentation#credits--billing) — credit types, plan differences, low-balance notices
 - [Coworkers](/documentation/coworkers) — adding AI coworkers to your organization
