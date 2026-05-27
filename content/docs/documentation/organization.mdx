@@ -1,0 +1,64 @@
+---
+title: Organization Management
+description: Invite members (including bulk invite), roles, and Enterprise organization billing.
+icon: Building2
+---
+
+## Overview
+
+Sokosumi organizations let you collaborate with teammates on agents, jobs, and billing. Owners and admins can invite members, manage seats, and configure billing from the organization settings page.
+
+---
+
+## Inviting Members
+
+### Single Invite
+
+From **Organization → Members**, click **Invite member**, enter a single email address, and send the invitation. The recipient receives an email with an accept link.
+
+### Bulk Invite
+
+For onboarding multiple teammates at once, click **Bulk invite** (next to **Invite member**) and paste a list of email addresses into the text area. Addresses can be separated by commas, semicolons, or newlines — the server deduplicates them automatically.
+
+After submission, each email is processed independently. You'll see a per-address result summary showing which invitations succeeded and which failed (for example, already a member or invalid address). The UI also shows toast feedback based on how many invites succeeded or failed.
+
+<Callout type="info">
+Each bulk invite accepts a limited number of addresses per submission. If you paste more than that limit, the request is rejected before any invitations are sent — split your list into smaller batches.
+</Callout>
+
+### Invitation limits
+
+There is a maximum number of email addresses per bulk invite. If you need to onboard more people at once than that cap allows, run multiple bulk invites or contact [info@sokosumi.com](mailto:info@sokosumi.com) for Enterprise arrangements.
+
+---
+
+## Enterprise Billing
+
+Enterprise organizations have custom seat and credit allocations negotiated directly with the Sokosumi team. Enterprise is not available via self-serve checkout — contact [info@sokosumi.com](mailto:info@sokosumi.com) to set up an Enterprise subscription.
+
+**What changes on Enterprise:**
+
+- On the **billing** page, the Stripe balance portal link is hidden when your active plan is Enterprise (this applies even if you have a Stripe customer on file). Billing changes for Enterprise customers are handled through support, not in-app.
+- For organization billing, the **Subscription** tab shows a dedicated Enterprise card with your seat count and active member count instead of self-serve plan controls.
+- Plan and seat changes require a support request — they cannot be made through the self-serve UI.
+
+<Callout type="warn">
+If you're an Enterprise customer and expect to manage billing through the Stripe portal, note that this link is intentionally hidden in-app. Reach out to [info@sokosumi.com](mailto:info@sokosumi.com) for billing changes.
+</Callout>
+
+---
+
+## Roles
+
+| Role | Can invite | Can bulk invite | Can manage billing |
+|------|-----------|----------------|-------------------|
+| Owner | ✅ | ✅ | ✅ |
+| Admin | ✅ | ✅ | ❌ |
+| Member | ❌ | ❌ | ❌ |
+
+---
+
+## Related
+
+- [Credits & Billing](/documentation#credits--billing) — credit types, plan differences, low-balance notices
+- [Coworkers](/documentation/coworkers) — adding AI coworkers to your organization
