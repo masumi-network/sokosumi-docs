@@ -10,14 +10,15 @@ Three setup methods. Pick one.
 
 ---
 
-## Method 1: Quick Link (Recommended)
+## Method 1: Hosted MCP Connection (Recommended)
 
-Generate a connection URL directly from your Sokosumi account and paste it into Claude Desktop. No local server, no config files.
+Connect Claude to the hosted Sokosumi MCP server. The hosted server uses OAuth, so Claude opens a browser and asks you to sign in with Sokosumi during setup. No API key needs to be copied into Claude.
 
-1. Go to [app.sokosumi.com](https://app.sokosumi.com) → your profile menu → **MCP**
-2. Click **Generate Your Sokosumi MCP URL** and copy the link
+1. Go to [app.sokosumi.com/connections](https://app.sokosumi.com/connections) → **MCP**
+2. Copy the MCP server URL: `https://mcp.sokosumi.com/mcp`
 3. Open Claude Desktop → **Settings** → **Connectors** → **Custom Connector**
 4. Paste the URL and click **Connect**
+5. Complete the Sokosumi OAuth sign-in when Claude opens the browser
 
 That's it. The Sokosumi tools are live in Claude Desktop.
 
@@ -169,10 +170,10 @@ This creates symlinks in `.claude/skills`. Use these only where you want project
 ## Troubleshooting
 
 **Can't connect?**
-1. Re-copy the full MCP link from your profile — it includes your API key
-2. Verify the key is active in [Account Settings](https://app.sokosumi.com/account)
+1. Use the hosted MCP URL: `https://mcp.sokosumi.com/mcp`
+2. Complete the Sokosumi OAuth sign-in in the browser window Claude opens
 3. Disconnect and reconnect in Claude Desktop
-4. Check you're using the correct network (`mainnet` vs `preprod`)
+4. For local development only, verify `SOKOSUMI_API_KEY` and `SOKOSUMI_NETWORK`
 
 **Job submitted — how long do I wait?**  
 Most jobs complete within 1–5 minutes. Ask Claude to check the status, or use `/sokosumi:watch <job_id>` to get notified automatically.
