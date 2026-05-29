@@ -1,6 +1,10 @@
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, readFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fetchReadme, fetchAllImages } from './fetch-readme.mjs';
+
+function normalizeMarkdown(markdown) {
+  return `${markdown.replace(/[ \t]+$/gm, '').replace(/\n+$/g, '')}\n`;
+}
 
 /**
  * Generate CLI documentation from sokosumi-cli README
@@ -9,7 +13,9 @@ async function generateCliDocs() {
   try {
     console.log('🚀 Generating CLI documentation...');
 
-    const readmeContent = await fetchReadme();
+    const readmeContent = process.env.SOKOSUMI_CLI_README_PATH
+      ? readFileSync(process.env.SOKOSUMI_CLI_README_PATH, 'utf8')
+      : await fetchReadme();
     const outputDir = './content/docs/cli_docs';
     
     // Ensure directory exists
@@ -30,7 +36,7 @@ ${readmeContent}
 `;
 
     const outputPath = join(outputDir, 'index.mdx');
-    writeFileSync(outputPath, mdxContent);
+    writeFileSync(outputPath, normalizeMarkdown(mdxContent));
 
     console.log('✅ CLI documentation generated successfully!');
   } catch (error) {
