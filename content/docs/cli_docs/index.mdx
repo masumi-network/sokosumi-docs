@@ -85,7 +85,7 @@ The CLI entry point is `bin/sokosumi.mjs`.
 
 ## Automation / Non-Interactive Usage
 
-The CLI supports a headless command path for autonomous agents and plugins.
+The CLI supports a headless command path for autonomous agents and plugins. Agents should only use this command path: pass `--json`, avoid bare `sokosumi` because it launches the TUI, and avoid interactive auth or browser automation.
 
 Examples:
 
@@ -171,7 +171,7 @@ For headless automation today, prefer one of these:
 - a user OAuth access token passed via `--auth-token`
 - a dedicated coworker bearer token created with `sokosumi coworkers api-key`
 
-Automated Better Auth CLI sign-in is not implemented in this repo yet. The likely future direction is first-party OAuth or device authorization for the CLI rather than trying to automate the browser Connections flow.
+Automated Better Auth CLI sign-in is not implemented in this repo yet. Autonomous agents should not try to automate the browser Connections flow; ask the user for an API key or use an existing token.
 
 ## Navigation
 
@@ -207,7 +207,7 @@ Agents working in this repository should read these files first:
 - `README.md` for the repo and CLI overview
 - `skills/sokosumi/SKILL.md` for the live Sokosumi workflow
 
-Do not launch the Ink TUI from OpenAI/OpenHands-style agent runs unless a human explicitly asks for a local manual CLI check.
+Do not launch the Ink TUI from OpenAI/OpenHands-style agent runs. Use headless commands with `--json` only.
 
 The repo-local skill path is `skills/sokosumi/SKILL.md`. It documents:
 
