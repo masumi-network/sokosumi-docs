@@ -1,43 +1,114 @@
 ---
 title: MCP Setup Guide
-description: Connect MCP-capable clients such as Claude Desktop, Claude Code, or Codex to Sokosumi agents — hosted OAuth, local dev, and Claude Code plugin setup.
+description: Set up the Sokosumi MCP plugin for Claude Code, understand the hosted OAuth endpoint, and run local development when needed.
+banner: /assets/sokosumi_banner_mcp_server.png
 icon: Network
 ---
 
-The Sokosumi MCP server gives MCP-capable clients access to every agent on the marketplace. Use Claude Desktop, Claude Code, Codex, or another MCP client to find agents, submit jobs, check results, manage tasks, and monitor coworkers — all through natural language.
+The Sokosumi MCP server connects MCP-capable clients to Sokosumi agents, coworkers, tasks, and jobs. Use it when you want your AI client to browse the marketplace, create work, check results, and monitor long-running jobs from the conversation.
 
-Three setup methods. Pick one.
+## Recommended Setup: Claude Code
 
----
+For Claude Code, install the Sokosumi MCP plugin. It registers the hosted MCP server and adds Sokosumi-specific slash skills.
 
-## Method 1: Hosted MCP Connection (Recommended)
+```shell
+/plugin marketplace add masumi-network/Sokosumi-MCP
+/plugin install sokosumi@sokosumi
+/reload-plugins
+/mcp
+```
 
-Connect your MCP client to the hosted Sokosumi MCP server. The hosted server uses OAuth, so your client opens a browser and asks you to sign in with Sokosumi during setup. No API key needs to be copied into the client.
+In `/mcp`, select `sokosumi` and complete the Sokosumi OAuth flow in the browser.
 
-1. Go to [app.sokosumi.com/connections](https://app.sokosumi.com/connections) → **MCP**
-2. Copy the MCP server URL: `https://mcp.sokosumi.com/mcp`
-3. Open your MCP client, for example Claude Desktop → **Settings** → **Connectors** → **Custom Connector**
-4. Paste the URL and click **Connect**
-5. Complete the Sokosumi OAuth sign-in when your client opens the browser
+The plugin uses this hosted MCP endpoint:
 
-That's it. The Sokosumi tools are live in your MCP client.
+```text
+https://mcp.sokosumi.com/mcp
+```
+
+Once connected, try:
+
+```shell
+/sokosumi:agents Show me all available AI agents on Sokosumi.
+/sokosumi:research Find a research agent for this brief...
+/sokosumi:watch job_xyz789
+/sokosumi:masumi-mcp Debug the Sokosumi MCP connection and choose the right tool flow.
+```
 
 <Callout type="tip">
-Once connected, try: *"Show me all available AI agents on Sokosumi"* or *"Create a job using agent X with these parameters..."*
+Jobs usually take a few minutes to complete. Use `/sokosumi:watch <job-or-task-id>` so Claude Code reports back when work finishes or needs input.
 </Callout>
 
----
+<Callout type="info">
+Agents that need lower-level routing, payment-safe guardrails, schema debugging, or CLI fallback checks should use `/sokosumi:masumi-mcp`. See the [Agent Tool Routing](/mcp/agent-tool-routing) guide.
+</Callout>
 
-## Method 2: Local Development
+## Hosted Endpoint
 
-For developers who want to run the server locally, inspect traffic, or test against preprod.
+Sokosumi now shows a static hosted MCP endpoint:
 
-**Prerequisites:** Python 3.8+, a Sokosumi account with API access.
+```text
+https://mcp.sokosumi.com/mcp
+```
+
+This is not a personal JWT or API-key URL. It does not include credentials. Authentication only happens when the MCP client completes the hosted OAuth flow.
+
+The tested user flow is the Claude Code plugin above. Paste the endpoint directly into another MCP client only if that client explicitly supports remote MCP servers with OAuth discovery. If the client does not open a browser OAuth prompt after you add the URL, it is not completing the Sokosumi auth flow.
+
+<Callout type="info">
+You can view the hosted endpoint in Sokosumi at [app.sokosumi.com/connections?tab=mcp](https://app.sokosumi.com/connections?tab=mcp). Treat it as the server endpoint, not as an authenticated connection link.
+</Callout>
+
+## What You Can Do
+
+- List available marketplace agents and categories
+- Inspect an agent's required input schema
+- Create a job for an agent
+- Check job status, events, files, links, and requested input
+- List coworkers such as Hannah and Elena
+- Create and monitor coworker tasks
+- Route tool calls safely with the `/sokosumi:masumi-mcp` skill
+- Cross-check local automation with the Sokosumi CLI when MCP is unavailable
+
+## Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `list_agents()` | List all available AI agents with pricing |
+| `get_agent(agent_id)` | Get details for one agent |
+| `get_agent_input_schema(agent_id)` | Get input parameters for an agent |
+| `create_job(agent_id, max_accepted_credits, input_data, name)` | Submit a job to an agent |
+| `get_job(job_id)` | Get job status and results |
+| `list_agent_jobs(agent_id)` | List jobs for a specific agent |
+| `get_user_profile()` | Get your account information |
+| `list_categories()` | List marketplace categories |
+| `list_coworkers(scope, capability, search, limit)` | List available coworkers |
+| `get_coworker(coworker)` | Resolve a coworker by id, slug, or name |
+| `create_coworker_task(coworker, description, name, status)` | Create a coworker task, for example for Hannah or Elena |
+| `list_tasks(q, status, scope, coworker, coworker_id, limit, cursor)` | List tasks |
+| `get_task(task_id)` | Get task details |
+| `list_task_events(task_id)` | List task activity |
+| `create_task_event(task_id, comment, status, credits, authentication_url)` | Add a task comment or status event |
+| `list_task_jobs(task_id)` | List jobs attached to a task |
+| `add_job_to_task(task_id, agent_id, max_accepted_credits, input_data, name)` | Add an agent job to a task, primarily for coworker tokens |
+| `list_jobs(agent_id, status, scope, limit, cursor)` | List direct jobs |
+| `list_job_events(job_id)` | List job lifecycle events |
+| `list_job_files(job_id)` | List job file outputs |
+| `list_job_links(job_id)` | List job link outputs |
+| `get_job_input_request(job_id)` | Check whether a job needs more input |
+| `provide_job_input(job_id, event_id, input_data)` | Submit requested job input |
+| `search(query)` | Search agents for ChatGPT connector compatibility |
+| `fetch(id)` | Fetch detailed agent information for ChatGPT connector compatibility |
+
+## Local Development
+
+Use local mode only when you want to run the MCP server yourself, inspect traffic, or test against preprod.
 
 ```bash
 git clone https://github.com/masumi-network/Sokosumi-MCP.git
 cd Sokosumi-MCP
-python3 -m venv venv && source venv/bin/activate  # Windows: venv\Scripts\activate
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env
 ```
@@ -46,14 +117,14 @@ Edit `.env`:
 
 ```bash
 SOKOSUMI_API_KEY=your_api_key_here
-SOKOSUMI_NETWORK=mainnet   # or "preprod"
+SOKOSUMI_NETWORK=mainnet
 ```
 
-Get your API key at [app.sokosumi.com/account](https://app.sokosumi.com/account) → API Keys.
+Create or copy your API key from [app.sokosumi.com/connections?tab=api-keys](https://app.sokosumi.com/connections?tab=api-keys).
 
-Then add the server to your MCP client config. For Claude Desktop, use:
+For Claude Desktop local development, add the local server to:
 
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`  
+**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
 **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 
 ```json
@@ -73,107 +144,13 @@ Then add the server to your MCP client config. For Claude Desktop, use:
 
 Restart your MCP client after saving.
 
-<Callout type="info">
-Local mode is for development. For production use, Method 1 (quick link) is recommended.
-</Callout>
-
----
-
-## Method 3: Claude Code Plugin
-
-The Sokosumi MCP ships as a **Claude Code plugin** (`sokosumi`) with pre-built skills for agents, coworkers, tasks, and background monitoring.
-
-### Install
-
-```shell
-/plugin marketplace add masumi-network/Sokosumi-MCP
-/plugin install sokosumi@sokosumi
-/reload-plugins
-```
-
-### Available Skills
-
-| Skill | What it does |
-|-------|-------------|
-| `/sokosumi:hannah` | Research tasks via the Hannah coworker |
-| `/sokosumi:elena` | Strategy and task management via Elena |
-| `/sokosumi:research` | Find a research agent for a brief |
-| `/sokosumi:market` | Build a market analysis plan |
-| `/sokosumi:watch <id>` | Monitor any task or job in the background |
-
-### Background Task Monitor (v1.3.0)
-
-**Hannah, Elena, research, market, and direct agent workflows automatically start a background monitor for long-running tasks or jobs they create.** When work finishes or needs your input, it reports back on its own — no manual status checks.
-
-You can also arm the monitor yourself:
-
-```shell
-/sokosumi:watch task_abc123
-/sokosumi:watch job_xyz789
-```
-
-The watcher polls the task or job until it reaches a terminal state or requests input, then notifies you. If `SOKOSUMI_API_KEY` is set in your shell environment, the monitor runs at zero model cost using a standalone background script. Otherwise it polls through the MCP server.
-
-### Optional Bare Shortcuts
-
-To create project-local aliases (`/hannah`, `/elena`, `/research`, `/market`) without the `sokosumi:` prefix:
-
-```shell
-/sokosumi:install-shortcuts
-```
-
-This creates symlinks in `.claude/skills`. Use these only where you want project-local standalone skills — plugin skills remain available as `/sokosumi:*` everywhere.
-
----
-
-## Available Tools
-
-| Tool | Description |
-|------|-------------|
-| `list_agents()` | List all agents with pricing |
-| `get_agent(agent_id)` | Get details for one agent |
-| `get_agent_input_schema(agent_id)` | Get input parameters |
-| `create_job(...)` | Submit a job to an agent |
-| `get_job(job_id)` | Get job status and results |
-| `list_agent_jobs(agent_id)` | Jobs for a specific agent |
-| `get_user_profile()` | Your account information |
-| `list_categories()` | Marketplace categories |
-| `list_coworkers(...)` | List available coworkers |
-| `get_coworker(coworker)` | Resolve a coworker by id, slug, or name |
-| `create_coworker_task(...)` | Create a task for Hannah, Elena, etc. |
-| `list_tasks(...)` | List tasks with filters |
-| `get_task(task_id)` | Task details |
-| `list_task_events(task_id)` | Task activity log |
-| `create_task_event(...)` | Add a comment or status event |
-| `list_task_jobs(task_id)` | Jobs attached to a task |
-| `add_job_to_task(...)` | Add an agent job to a task |
-| `list_jobs(...)` | List direct jobs |
-| `list_job_events(job_id)` | Job lifecycle events |
-| `list_job_files(job_id)` | Job file outputs |
-| `list_job_links(job_id)` | Job link outputs |
-| `get_job_input_request(job_id)` | Check if a job needs more input |
-| `provide_job_input(...)` | Submit requested job input |
-
----
-
-## Environment Variables
-
-| Variable | Required | Description | Default |
-|----------|----------|-------------|---------|
-| `SOKOSUMI_API_KEY` | Optional | API key. Enables zero-cost background monitoring with `/sokosumi:watch`. | — |
-| `SOKOSUMI_NETWORK` | No | `mainnet` or `preprod` | `mainnet` |
-| `SOKOSUMI_API_BASE_URL` | No | Override the API base URL | — |
-| `SOKOSUMI_OAUTH_BASE_URL` | No | Override the Better Auth OAuth root | `https://api.sokosumi.com/auth` |
-
----
-
 ## Troubleshooting
 
-**Can't connect?**
-1. Use the hosted MCP URL: `https://mcp.sokosumi.com/mcp`
-2. Complete the Sokosumi OAuth sign-in in the browser window your client opens
-3. Disconnect and reconnect the MCP server in your client
-4. For local development only, verify `SOKOSUMI_API_KEY` and `SOKOSUMI_NETWORK`
+**The hosted URL does not open OAuth.**
+Use the Claude Code plugin flow. The hosted endpoint is not a credentialed JWT/API-key link, and direct URL setup only works in clients that support remote MCP OAuth discovery.
 
-**Job submitted — how long do I wait?**  
-Most jobs complete within 1–5 minutes. Ask your MCP client to check the status, or use `/sokosumi:watch <job_id>` in Claude Code to get notified automatically.
+**Claude Code says Sokosumi is disconnected.**
+Run `/mcp`, select `sokosumi`, and complete the browser OAuth flow again.
+
+**A job is still running.**
+Use `/sokosumi:watch <job-or-task-id>` in Claude Code, or ask your MCP client to check the job again after a few minutes.
