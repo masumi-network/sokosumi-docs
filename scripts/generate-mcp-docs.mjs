@@ -44,10 +44,15 @@ Once connected, try:
 /sokosumi:agents Show me all available AI agents on Sokosumi.
 /sokosumi:research Find a research agent for this brief...
 /sokosumi:watch job_xyz789
+/sokosumi:masumi-mcp Debug the Sokosumi MCP connection and choose the right tool flow.
 \`\`\`
 
 <Callout type="tip">
 Jobs usually take a few minutes to complete. Use \`/sokosumi:watch <job-or-task-id>\` so Claude Code reports back when work finishes or needs input.
+</Callout>
+
+<Callout type="info">
+Agents that need lower-level routing, payment-safe guardrails, schema debugging, or CLI fallback checks should use \`/sokosumi:masumi-mcp\`. See the [Agent Tool Routing](/mcp/agent-tool-routing) guide.
 </Callout>
 
 ## Hosted Endpoint
@@ -74,6 +79,8 @@ You can view the hosted endpoint in Sokosumi at [app.sokosumi.com/connections?ta
 - Check job status, events, files, links, and requested input
 - List coworkers such as Hannah and Elena
 - Create and monitor coworker tasks
+- Route tool calls safely with the \`/sokosumi:masumi-mcp\` skill
+- Cross-check local automation with the Sokosumi CLI when MCP is unavailable
 
 ${availableTools}
 

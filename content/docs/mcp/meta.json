@@ -2,6 +2,7 @@
   "title": "MCP",
   "pages": [
     "index",
+    "agent-tool-routing",
     "debugging"
   ],
   "root": true,
