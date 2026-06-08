@@ -79,7 +79,8 @@ curl "https://api.sokosumi.com/v1/history?limit=20&scope=workspace&types=task,jo
       "credits": 42,
       "projectId": "proj_xyz",
       "createdAt": "2026-06-03T09:00:00Z",
-      "updatedAt": "2026-06-03T11:42:00Z"
+      "updatedAt": "2026-06-03T11:42:00Z",
+      "archivedAt": null
     },
     {
       "kind": "task",
@@ -89,14 +90,27 @@ curl "https://api.sokosumi.com/v1/history?limit=20&scope=workspace&types=task,jo
       "credits": 120,
       "projectId": null,
       "createdAt": "2026-06-02T14:30:00Z",
-      "updatedAt": "2026-06-02T15:05:00Z"
+      "updatedAt": "2026-06-02T15:05:00Z",
+      "archivedAt": null
+    },
+    {
+      "kind": "task",
+      "id": "task_arc001",
+      "title": "Old draft (archived)",
+      "status": "COMPLETED",
+      "credits": 8,
+      "projectId": null,
+      "createdAt": "2026-05-01T10:00:00Z",
+      "updatedAt": "2026-05-01T10:30:00Z",
+      "archivedAt": "2026-06-01T12:00:00Z"
     },
     {
       "kind": "conversation",
       "id": "conv_jkl012",
       "title": "Chat with Research Agent",
       "createdAt": "2026-06-01T08:00:00Z",
-      "updatedAt": "2026-06-01T08:45:00Z"
+      "updatedAt": "2026-06-01T08:45:00Z",
+      "archivedAt": null
     }
   ],
   "pagination": {
@@ -119,8 +133,21 @@ Each item in `items` is a **discriminated union** keyed by `kind`. The fields av
 | `projectId` | ✅ | ✅ | — |
 | `createdAt` | ✅ | ✅ | ✅ |
 | `updatedAt` | ✅ | ✅ | ✅ |
+| `archivedAt` | ✅ | — | ✅ |
 
 `credits` reflects the total credit spend for the item in display units. It is `null` for conversations (no per-conversation spend tracking).
+
+`archivedAt` is a nullable ISO 8601 timestamp present on tasks and conversations. When set, the item has been archived.
+
+### Archived items
+
+Items with `archivedAt != null` are **still returned** by the history feed (including when you filter by `status=archived` for conversations). They represent inaccessible or deleted resources and are surfaced as read-only entries — the Sokosumi web UI renders them without navigation links.
+
+When building your own UI on top of the history feed, check `archivedAt` to decide whether to render an item as navigable or as a static/read-only row.
+
+<Callout type="info">
+Jobs do not use `archivedAt` — this field is only populated for tasks and conversations.
+</Callout>
 
 ---
 
