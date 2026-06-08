@@ -72,16 +72,56 @@ The subscription seat count cannot be reduced below the number of currently assi
 
 ## Enterprise Billing
 
-Enterprise organizations have custom seat and credit allocations negotiated directly with the Sokosumi team. Enterprise is not available via self-serve checkout — contact [info@sokosumi.com](mailto:info@sokosumi.com) to set up an Enterprise subscription.
+Enterprise organizations run on **enterprise contracts** — custom commercial terms with an organization-level shared credit pool, negotiated directly with the Sokosumi team. Enterprise is not available via self-serve checkout. Contact [info@sokosumi.com](mailto:info@sokosumi.com) to set up an enterprise contract.
 
-**What changes on Enterprise:**
+### Credit pool
 
-- On the **billing** page, the Stripe balance portal link is hidden when your active plan is Enterprise (this applies even if you have a Stripe customer on file). Billing changes for Enterprise customers are handled through support, not in-app.
-- Seat assignment works the same way as on paid self-serve plans — the **Members** table shows seat status and assign/unassign controls.
-- Plan and seat changes require a support request — they cannot be made through the self-serve UI.
+Rather than individual per-member subscriptions, enterprise orgs share a single **organization credit pool**:
+
+- Credits are granted monthly according to the contract terms (`creditsPerMonth`).
+- An optional **one-time top-up** bucket can be included with an expiry date.
+- Only members with an **assigned seat** can spend from the org pool. Unassigned members fall back to free monthly credits.
+
+The pool balance, monthly grant amount, current period end date, contract end date, and purchased seats are all visible on the **Billing** page under the Enterprise Contract card.
+
+### Billing page
+
+When your organization is on an active enterprise contract, the **Billing** page shows an **Enterprise Contract** card instead of the standard Stripe subscription UI. The card includes:
+
+- **Remaining pool balance** — org-level credits available for assigned members to spend
+- **Monthly grant** — credits added at the start of each contract period
+- **Current period end** — when the next grant is scheduled
+- **Contract end** — the last day of your commercial term
+- **Purchased seats** — seat count defined in your contract
+
+A **Contact us** link (→ [info@sokosumi.com](mailto:info@sokosumi.com)) replaces the Stripe billing portal. Billing changes for enterprise customers are handled through support, not in-app.
+
+### Self-serve subscription gating
+
+While your enterprise contract is within its commercial term (the **consumable** window):
+
+- **Self-serve subscription checkout and plan changes are blocked.** You cannot subscribe to or modify a self-serve plan while your enterprise contract is active.
+- **Top-ups and coupon claims remain available** — you can still purchase additional credit top-ups or apply promotional coupons.
+
+<Callout type="info">
+The self-serve subscription block applies only during the active contract term. Once your contract term ends, self-serve subscriptions and free-tier credit grants resume automatically.
+</Callout>
+
+### Seat assignment on Enterprise
+
+Seat assignment works the same way as on paid self-serve plans — the **Members** table shows seat status and assign/unassign controls. The number of available seats is defined by your enterprise contract rather than a Stripe subscription.
+
+Member invitations also work without Stripe: as long as your contract defines seats, new members can be invited and assigned without completing a Stripe checkout.
+
+### Post-term behaviour
+
+When the contract term ends (the daily renewal sync marks the contract `completed`):
+
+- The enterprise billing card remains visible on the Billing page until the contract row is cleared.
+- Self-serve subscriptions and free-tier credit grants resume immediately — unassigned members begin receiving free monthly credits again, and self-serve checkout is re-enabled.
 
 <Callout type="warn">
-If you're an Enterprise customer and expect to manage billing through the Stripe portal, note that this link is intentionally hidden in-app. Reach out to [info@sokosumi.com](mailto:info@sokosumi.com) for billing changes.
+There is a short window between commercial term end and the nightly renewal sync completing. During this window the enterprise card may still show but `isConsumable` is false — self-serve and free-tier grants are already re-enabled.
 </Callout>
 
 ---
