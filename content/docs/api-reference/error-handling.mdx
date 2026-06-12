@@ -1,0 +1,80 @@
+---
+title: Error Handling
+description: How the Sokosumi API signals errors — envelope format, status codes, and the stable machine-readable kind field.
+icon: TriangleAlert
+---
+
+## Error Envelope
+
+All error responses use a consistent JSON envelope regardless of status code.
+
+```json
+{
+  "error": "NotFound",
+  "message": "Organization not found",
+  "kind": "organization_not_found",
+  "meta": {
+    "timestamp": "2026-06-12T10:23:45.123Z",
+    "requestId": "5091b3ea-994f-4417-8e04-2efc05dd8673",
+    "path": "/v1/organizations/acme",
+    "method": "GET"
+  }
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `error` | `string` | HTTP-status-derived name (e.g. `"NotFound"`, `"Forbidden"`). |
+| `message` | `string` | Human-readable description. **Do not match on this** — wording may change. |
+| `kind` | `string` (optional) | Stable snake_case identifier. Match on this in your error handling code. Omitted when no kind is assigned. |
+| `meta.timestamp` | `string` | ISO 8601 timestamp when the error was generated. |
+| `meta.requestId` | `string` | Unique request ID. Include this when reporting issues. |
+| `meta.path` | `string` | The request path that produced the error. |
+| `meta.method` | `string` | The HTTP method of the request. |
+
+## The `kind` Field
+
+The `kind` field was added to give clients a stable, machine-readable identifier to branch on — separate from `message`, which may be reworded at any time.
+
+**Always match on `kind`, not `message`:**
+
+```typescript
+const res = await fetch("https://api.sokosumi.com/v1/...");
+if (!res.ok) {
+  const err = await res.json();
+  switch (err.kind) {
+    case "organization_not_found":
+      // handle missing org
+      break;
+    case "insufficient_credits":
+      // prompt user to top up
+      break;
+    default:
+      // generic fallback using err.error + err.message
+      throw new Error(`${err.error}: ${err.message}`);
+  }
+}
+```
+
+<Callout type="info">
+`kind` is optional — not all error paths have a kind assigned yet. Always implement a fallback for when `kind` is absent.
+</Callout>
+
+## HTTP Status Codes
+
+| Status | `error` value | Typical cause |
+|---|---|---|
+| `400` | `BadRequest` | Malformed request body or invalid parameters. |
+| `401` | `Unauthorized` | Missing or invalid API key. |
+| `403` | `Forbidden` | Valid credentials but insufficient permissions. |
+| `404` | `NotFound` | Resource does not exist. |
+| `409` | `Conflict` | Request conflicts with current server state (e.g. duplicate). |
+| `413` | `PayloadTooLarge` | Request body exceeds size limits. |
+| `422` | `UnprocessableEntity` | Well-formed request but semantically invalid. |
+| `429` | `TooManyRequests` | Rate limit exceeded. |
+| `500` | `InternalServerError` | Unexpected server-side error. |
+| `503` | `ServiceUnavailable` | Server temporarily unable to handle the request. |
+
+## Debugging with `requestId`
+
+Every error response includes a `meta.requestId`. When filing a bug report or contacting support, include this value — it lets the team correlate your request in the server logs.
