@@ -41,6 +41,22 @@ You can update your role and company at any time from your Hermes settings.
 
 ---
 
+## Persona Customization
+
+Beyond role and company, you can optionally configure how Hermes presents itself and communicates:
+
+| Setting | Description |
+|---|---|
+| **Name** | A display name for your Hermes instance. |
+| **Verbosity** | Controls response length and level of detail. |
+| **Tone** | Controls the communication style of responses. |
+
+All three settings are optional. Setting verbosity or tone to `null` resets them to system defaults.
+
+You can update these at any time from your Hermes settings.
+
+---
+
 ## Autonomy Levels
 
 Hermes supports configurable autonomy levels that control how proactively it acts on your behalf:
@@ -73,6 +89,20 @@ Connected services become available as tools Hermes can call during your convers
 
 <Callout type="warn">
 If a connected service returns a 4xx or 5xx error, Hermes will surface the error directly — it will not silently report the request as "deferred" or "pending".
+</Callout>
+
+---
+
+## Morning Brief
+
+Hermes produces a morning brief at the start of each session. It surfaces what's relevant to your day, including:
+
+- Pending tasks and scheduled work
+- Recent **email** activity (when email is connected via Composio)
+- Status of your **connected integrations**
+
+<Callout type="info">
+The morning brief expands as you connect more integrations. Email activity is included only when an email account is connected via Composio.
 </Callout>
 
 ---
