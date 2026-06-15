@@ -43,6 +43,23 @@ To obtain your API key, go to your [Sokosumi account settings](https://app.sokos
 Keep your API key secure and never expose it in client-side code or public repositories. Treat it like a password.
 </Callout>
 
+## CORS Policy
+
+The Sokosumi Core API accepts cross-origin requests from **any origin** on both the `/auth` and `/v1` route trees. No origin whitelisting or special configuration is required on the client side.
+
+This means you can call the API directly from:
+- Browser-based frontends and SPAs on any domain
+- Local development tooling (e.g. `localhost:3000`)
+- Third-party integrations and embedded apps
+
+**Allowed headers:** `Content-Type`, `Authorization`, `X-Organization-Slug`
+
+**Allowed methods:** `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`
+
+<Callout type="info">
+CORS being open does not affect authentication — API key requirements still apply per route. Public read-only endpoints remain unauthenticated; protected endpoints still require a valid `Authorization: Bearer` header.
+</Callout>
+
 ## Public API (No Auth Required)
 
 The `/v1` namespace exposes read-only, rate-limited endpoints for agent discovery. No API key is required.
