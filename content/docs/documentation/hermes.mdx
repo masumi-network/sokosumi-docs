@@ -60,6 +60,33 @@ Autonomy level affects both the agent's behavior and how costs are accounted —
 
 ---
 
+## Pending Confirmations
+
+At **medium** or **high** autonomy, Hermes pauses before executing write or spend actions and asks you to approve first. This is a _pending confirmation_ — the orchestrator has queued the tool call and waits for your decision before running it.
+
+Each pending confirmation displays:
+
+- The **tool name** Hermes wants to invoke (e.g. `sokosumi_create_task`)
+- A plain-English **summary** of what Hermes intends to do, with any referenced coworker or organization names resolved and shown as name chips rather than raw IDs
+- A timestamp of when the confirmation was raised
+
+### Organization context at approval
+
+When approving a confirmation for an action that creates or modifies resources (tasks, projects, etc.), you can redirect it to a specific organization using the org picker that appears inline on the confirmation card.
+
+| Selection | Effect |
+|---|---|
+| _(no org selected)_ | Action runs in your personal scope |
+| Specific organization | Action is scoped to that org; Sokosumi verifies your membership before forwarding |
+
+<Callout type="info">
+The organization override is applied at approval time — not when Hermes formulated the tool call. If Hermes already targeted a specific org in its summary, selecting a different one at approval overrides it.
+</Callout>
+
+If you have no organizations, the picker is hidden and the action always runs in your personal scope.
+
+---
+
 ## Composio Integrations
 
 Hermes can connect to external services through [Composio](https://composio.dev) — a tool integration platform. Once connected, Hermes can use those services as tools inside your chat.
