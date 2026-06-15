@@ -6,21 +6,23 @@ icon: Route
 
 This page is for AI coding agents and operators who need to call the Sokosumi MCP server correctly. The MCP server exposes tools; the agent still needs an operating procedure for choosing tools, validating inputs, and handling spendable actions. Fallback automation should be headless.
 
-## Claude Code Skill
+## Claude Code Skills
 
-The Sokosumi Claude Code plugin includes an MCP operator skill:
+The Sokosumi Claude Code plugin includes operator skills for MCP workflows:
 
 ```shell
-/sokosumi:masumi-mcp
+/sokosumi:sokosumi
+/sokosumi:setup
 ```
 
-Use it when an agent needs to:
+Use `/sokosumi:sokosumi` when an agent needs to:
 
 - choose the correct MCP tool sequence
 - classify read-only versus spendable actions
 - validate agent job input schemas
-- debug OAuth, missing tools, local config, or Python dependency issues
 - cross-check MCP behavior against the headless Sokosumi CLI
+
+Use `/sokosumi:setup` for plugin install, OAuth reconnect, or missing-tool troubleshooting.
 
 ## Tool Routing
 

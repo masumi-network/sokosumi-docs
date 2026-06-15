@@ -1,18 +1,15 @@
 import { writeFileSync, mkdirSync, readFileSync } from 'fs';
-import { join, dirname } from 'path';
-import { fetchReadme, fetchAllImages } from './fetch-readme.mjs';
-
-function normalizeMarkdown(markdown) {
-  return `${markdown.replace(/[ \t]+$/gm, '').replace(/\n+$/g, '')}\n`;
-}
+import { join } from 'path';
+import { fetchReadme, fetchAllImages, normalizeMarkdown } from './fetch-readme.mjs';
 
 function addHeadlessAgentGuardrails(markdown) {
   let updated = markdown;
 
-  updated = updated.replace(
-    'The CLI supports a headless command path for autonomous agents and plugins.',
-    'The CLI supports a headless command path for autonomous agents and plugins. Agents should only use this command path: pass `--json`, avoid bare `sokosumi` because it launches the TUI, and avoid interactive auth or browser automation.'
-  );
+  const headlessIntro = 'The CLI supports a headless command path for autonomous agents and plugins.';
+  const headlessGuardrail = `${headlessIntro} Agents should only use this command path: pass \`--json\`, avoid bare \`sokosumi\` because it launches the TUI, and avoid interactive auth or browser automation.`;
+  if (!updated.includes(headlessGuardrail)) {
+    updated = updated.replace(headlessIntro, headlessGuardrail);
+  }
 
   updated = updated.replace(
     'Automated Better Auth CLI sign-in is not implemented in this repo yet. The likely future direction is first-party OAuth or device authorization for the CLI rather than trying to automate the browser Connections flow.',
@@ -39,15 +36,12 @@ async function generateCliDocs() {
       : await fetchReadme();
     const readmeContent = addHeadlessAgentGuardrails(sourceReadmeContent);
     const outputDir = './content/docs/cli_docs';
-    
-    // Ensure directory exists
+
     mkdirSync(outputDir, { recursive: true });
-    
-    // Dynamically fetch all images referenced in the README
+
     const baseUrl = 'https://raw.githubusercontent.com/masumi-network/sokosumi-cli/main';
     await fetchAllImages(readmeContent, baseUrl, outputDir);
-    
-    // Create MDX file with frontmatter and README content
+
     const mdxContent = `---
 title: Sokosumi CLI
 banner: /assets/sokosumi_banner_cli_tool.png
