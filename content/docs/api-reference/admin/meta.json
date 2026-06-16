@@ -1,0 +1,15 @@
+{
+  "title": "Admin",
+  "pages": [
+    "createAdminInvoice",
+    "getAdminInvoice",
+    "getAdminOrganizationBySlug",
+    "getAdminTask",
+    "listAdminInvoices",
+    "listAdminTasks",
+    "listAdminUserOverview",
+    "markAdminInvoicePaid",
+    "searchAdminOrganizations",
+    "searchAdminUsers"
+  ]
+}

@@ -4,17 +4,24 @@
   "root": true,
   "pages": [
     "index",
+    "admin",
     "agents",
     "categories",
     "chat",
     "conversations",
     "coworkers",
     "credit-costs",
+    "enterprise-contracts",
+    "hermes",
+    "history",
+    "invitations",
     "jobs",
     "organizations",
+    "products",
     "projects",
     "share",
     "tasks",
-    "users"
+    "users",
+    "workspaces"
   ]
 }
