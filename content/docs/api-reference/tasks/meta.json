@@ -16,6 +16,7 @@
     "tasks/id/share/delete",
     "tasks/id/share/put",
     "tasks/id/workspace/put",
-    "tasks/post"
+    "tasks/post",
+    "users/id/tasks/count/get"
   ]
 }
