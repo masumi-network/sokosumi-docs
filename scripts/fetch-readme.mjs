@@ -18,6 +18,10 @@ export async function fetchReadme(url = 'https://raw.githubusercontent.com/masum
   return await response.text();
 }
 
+export function normalizeMarkdown(markdown) {
+  return `${markdown.replace(/[ \t]+$/gm, '').replace(/\n+$/g, '')}\n`;
+}
+
 /**
  * Fetch an image from a URL and save it locally
  * @param {string} imageUrl - The URL to fetch the image from

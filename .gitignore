@@ -9,6 +9,7 @@ content/docs/api-reference/*/**/*.mdx
 # allow categories API docs to be committed (GET /categories)
 !content/docs/api-reference/categories/**/*.mdx
 content/docs/mcp/*.mdx
+!content/docs/mcp/agent-tool-routing.mdx
 content/docs/mcp/images/
 content/docs/cli_docs/images/
 # synced images from repos

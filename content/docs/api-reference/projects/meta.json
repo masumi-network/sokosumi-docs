@@ -9,6 +9,7 @@
     "projects/id/patch",
     "projects/id/tasks/post",
     "projects/id/tasks/taskid/delete",
-    "projects/post"
+    "projects/post",
+    "projects/stats/get"
   ]
 }
