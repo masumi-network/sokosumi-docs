@@ -15,6 +15,7 @@ icon: Package
 - Task poller that claims, processes, and completes task assignments automatically
 - Identity extraction helpers for user, task, message, and delegation payloads
 - Generic agent worker that wires everything together
+- Optional `/v1/chat` HTTP helper for agents that expose a direct chat endpoint
 - Masumi completion-payment client and settlement poller
 
 <Callout type="info">
@@ -134,6 +135,52 @@ startSokosumiAgentWorker({
 ```
 
 Use this when you want minimal boilerplate and don't need to customise poller callbacks directly.
+
+---
+
+## Optional Chat Route
+
+Agents that need a direct `/v1/chat` endpoint can opt in to the chat route helper. Agents that only run as Sokosumi workers do not need this — skip this section if your agent has no standalone HTTP surface.
+
+### Middleware mode
+
+Embed the handler inside an existing HTTP server (e.g. Express, Next.js route handler):
+
+```ts
+import { createPiAgentChatRouteHandler } from "@masumi-network/pi-sokosumi/chat";
+
+const chatRoute = createPiAgentChatRouteHandler({
+  defaultAgentId: "nori",
+  supportedAgentIds: ["nori"],
+  supportedSurfaces: ["chat"],
+  authorize: ({ req }) => assertAuthorized(req),
+  rateLimit: ({ req }) => assertWithinRateLimit(req),
+  handleChat: async ({ request }) => dispatchAgentRequest(request)
+});
+
+// In your request handler — returns true if the route handled the request
+if (await chatRoute(req, res)) return;
+```
+
+### Standalone server mode
+
+For agents that run chat as their only HTTP surface:
+
+```ts
+import { startPiAgentChatServer } from "@masumi-network/pi-sokosumi/chat";
+
+startPiAgentChatServer({
+  port: 3000,
+  defaultAgentId: "nori",
+  supportedAgentIds: ["nori"],
+  handleChat: async ({ request }) => ({
+    agentId: request.agentId,
+    reply: `Received: ${request.message}`
+  })
+});
+```
+
+Both modes share the same `handleChat` signature. The standalone server is a convenience wrapper — use middleware mode when you need to co-locate the chat route with other endpoints.
 
 ---
 
