@@ -77,6 +77,33 @@ If a connected service returns a 4xx or 5xx error, Hermes will surface the error
 
 ---
 
+## Skills Marketplace (Beta)
+
+In addition to Composio integrations, Hermes supports **installable skills** — discrete capability packs that extend what your instance can do.
+
+### Installing Skills
+
+Skills are installed through the Hermes Skills Marketplace in Sokosumi. Once installed, a skill is written to your Hermes instance via the `/v1/skills` routes and becomes immediately available as a tool in your conversations.
+
+### Persistence Across Reprovisioning
+
+Installed skills **persist automatically**. If your Hermes instance is ever reprovisioned (e.g. after infrastructure maintenance), Sokosumi replays your full installed skill set onto the new machine. You never need to reinstall skills manually.
+
+### Skills vs Composio Integrations
+
+| | Skills | Composio Integrations |
+|---|---|---|
+| Source | Sokosumi Skills Marketplace | Composio platform |
+| Auth | Managed by Sokosumi | OAuth / API key per service |
+| Persistence | Auto-replayed on reprovisioning | Must reconnect if instance is reset |
+| Availability | Marketplace catalogue | 250+ third-party services |
+
+<Callout type="info">
+Skills Marketplace is Phase 1 / early access. The available skill catalogue and installation UX will expand in future releases.
+</Callout>
+
+---
+
 ## Capabilities
 
 Hermes runs in a **chat-only** profile. The following capabilities are intentionally disabled in this Beta:
@@ -86,7 +113,7 @@ Hermes runs in a **chat-only** profile. The following capabilities are intention
 - Playwright (browser automation)
 - Filesystem writes
 
-External capabilities (web search, API calls, etc.) can be added through Composio integrations. Native tool access may expand in future Beta releases.
+External capabilities (web search, API calls, etc.) can be added through Composio integrations or Skills Marketplace. Native tool access may expand in future Beta releases.
 
 ---
 
@@ -127,7 +154,7 @@ Each Hermes instance is fully isolated:
 ## Known Limitations (Beta)
 
 - First provisioning takes 5–10 minutes — plan accordingly.
-- Chat-only profile by default: no web search, no code execution, no file writes (add capabilities via Composio).
+- Chat-only profile by default: no web search, no code execution, no file writes (add capabilities via Composio or Skills Marketplace).
 - Instance state is not backed up — data loss on underlying infrastructure failure is possible during Beta.
 - Cron-based task firing mirrors to Sokosumi tasks on preprod only (not yet on mainnet).
 - Hermes coworker delegation is not available in this Beta release.
