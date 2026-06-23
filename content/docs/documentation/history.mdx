@@ -45,8 +45,12 @@ Requires a valid **Bearer token** and a workspace context (pass `X-Workspace-Id`
 
 The `status` parameter behaves differently depending on item kind:
 
-- **Tasks and jobs** use standard status values: `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`, `PENDING`, etc.
+- **Tasks and jobs** use standard status values: `DRAFT`, `QUEUED`, `READY`, `RUNNING`, `COMPLETED`, `FAILED`, `CANCELLED`, `PENDING`, etc.
 - **Conversations** use only `active` and `archived`. A conversation is included in results *only* if `active` or `archived` is explicitly present in your `status` filter.
+
+<Callout type="info">
+**QUEUED tasks** are scheduled tasks waiting to run. They sit between `DRAFT` and `READY` in the task lifecycle and are visible to assigned coworkers. Unlike `DRAFT`, a `QUEUED` task requires a coworkerId — it is defined and awaiting its scheduled trigger but not yet actionable. Pass `status=QUEUED` explicitly if you want scheduled tasks to appear in filtered results.
+</Callout>
 
 <Callout type="warn">
 `status=active` returns **conversations only** — not running tasks or jobs. If you want running tasks and jobs alongside active conversations, use `status=RUNNING,active`.
@@ -194,6 +198,12 @@ curl "https://api.sokosumi.com/v1/history?scope=workspace&q=competitive+research
 **Tasks and jobs with no project assignment:**
 ```bash
 curl "https://api.sokosumi.com/v1/history?types=task,job&projectId=null" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+**Scheduled (queued) tasks only:**
+```bash
+curl "https://api.sokosumi.com/v1/history?types=task&status=QUEUED" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
