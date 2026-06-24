@@ -77,6 +77,55 @@ If a connected service returns a 4xx or 5xx error, Hermes will surface the error
 
 ---
 
+## Preinstalled Skills
+
+Hermes instances ship with a curated set of skills baked into the agent image. These are available to every user on the same image version automatically — no installation required and they cannot be removed.
+
+To list preinstalled skills for an instance:
+
+```http
+GET /v1/instances/{userId}/skills/preinstalled
+```
+
+**Response `200`:**
+```json
+{
+  "skills": [
+    {
+      "slug": "web-search",
+      "name": "Web Search",
+      "description": "Search the web and return relevant results."
+    }
+  ]
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `slug` | string | Unique identifier for the skill |
+| `name` | string | Human-readable display name |
+| `description` | string \| null | Short description (≤ 280 characters) |
+
+<Callout type="info">
+The preinstalled list is **identical for all users on a given image version** — it reflects what shipped with the image, not per-user configuration. The list is cached per image for up to 1 hour.
+</Callout>
+
+Returns `{ "skills": [] }` if the instance is not started or the skill list cannot be read at that moment. Returns `404` if the instance does not exist or has been destroyed.
+
+**Preinstalled skills cannot be removed.** Calling `DELETE /v1/instances/{userId}/skills/{slug}` on a preinstalled slug returns `409 Conflict`:
+
+```json
+{
+  "error": {
+    "message": "Pre-installed skills that ship with the agent image cannot be removed"
+  }
+}
+```
+
+To see which skills a user has installed from the marketplace, use `GET /v1/instances/{userId}/skills` instead. See the [Skills Marketplace](#skills-marketplace) section for how to install and manage marketplace skills.
+
+---
+
 ## Capabilities
 
 Hermes runs in a **chat-only** profile. The following capabilities are intentionally disabled in this Beta:
