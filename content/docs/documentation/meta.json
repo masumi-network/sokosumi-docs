@@ -5,6 +5,7 @@
   "pages": [
     "index",
     "projects",
+    "scheduling",
     "history",
     "coworkers",
     "image-generation",
