@@ -54,6 +54,8 @@ At **medium** autonomy, Hermes is instructed to always invoke the appropriate to
 
 At **high** autonomy, Hermes is more agentic — it will make sequences of tool calls to complete a goal and only surfaces blockers to you.
 
+Autonomy level also controls how Hermes handles `AWAITING_INPUT` jobs — see [Auto-Answering Paused Jobs](#auto-answering-paused-jobs) below.
+
 <Callout type="info">
 Autonomy level affects both the agent's behavior and how costs are accounted — higher autonomy typically means more tool calls and higher credit usage per session.
 </Callout>
@@ -98,6 +100,26 @@ This allows you to queue work for Hermes without being in an active chat session
 
 ---
 
+## Auto-Answering Paused Jobs
+
+When a Sokosumi job reaches `AWAITING_INPUT` — paused because a coworker agent needs a human decision before continuing — Hermes can detect and respond to it automatically. Every ~5 minutes, Hermes scans your workspaces for jobs in this state.
+
+What happens depends on your autonomy level:
+
+| Autonomy | Behavior |
+|---|---|
+| **High** | Hermes reads the input request, assembles an answer from your task context, memory, and prior job results, then submits immediately — no user confirmation required. |
+| **Medium** | Hermes reads the input request and raises a confirmation card in Sokosumi for you to approve before the answer is submitted. |
+| **Low** | Auto-answering is disabled. You'll receive a notification via the urgent-interrupt system instead. |
+
+<Callout type="warn">
+At **high** autonomy, Hermes submits answers to `AWAITING_INPUT` jobs without user review. Hermes only submits when it can trace every required field to real context — task purpose, prior instructions, memory, or prior job results. If any required field lacks a verifiable source, Hermes skips the job and leaves it paused for you. Despite this guardrail, review which tasks you assign to Hermes at high autonomy carefully.
+</Callout>
+
+You can disable this behavior per-instance by toggling the **input-responder** system sweep off in your Hermes settings.
+
+---
+
 ## Accessing Hermes
 
 Hermes is available inside Sokosumi chat. Select **Hermes** from the model or coworker picker when starting or continuing a conversation. Sokosumi routes your messages to your personal Hermes instance transparently.
@@ -131,6 +153,7 @@ Each Hermes instance is fully isolated:
 - Instance state is not backed up — data loss on underlying infrastructure failure is possible during Beta.
 - Cron-based task firing mirrors to Sokosumi tasks on preprod only (not yet on mainnet).
 - Hermes coworker delegation is not available in this Beta release.
+- At **high** autonomy, `AWAITING_INPUT` jobs are answered and submitted without user review. Disable the **input-responder** sweep in Hermes settings if you need manual control over all job inputs.
 
 ---
 
