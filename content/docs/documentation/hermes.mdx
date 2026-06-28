@@ -41,6 +41,26 @@ You can update your role and company at any time from your Hermes settings.
 
 ---
 
+## Voice & Personality
+
+You can tune Hermes' communication style during onboarding using three independent sliders, each ranging from 0 to 100. If you don't set them, all three default to 50 — the balanced behavior Hermes had before this feature existed.
+
+| Axis | 0 (low) | ~50 (default) | 100 (high) |
+|---|---|---|---|
+| **Warmth** | Direct — skip pleasantries | Balance warmth and efficiency | Warm, friendly, personable |
+| **Detail** | Short — lead with the answer | Normal amount of detail | Thorough — explain reasoning, add context |
+| **Register** | Formal, professional | Relaxed-professional | Casual and playful; light humour OK |
+
+Internally, the sliders are bucketed into three tiers (0–33 / 34–66 / 67–100), so small adjustments near 50 produce no visible change. Move a slider by at least 20 points to see a meaningful difference.
+
+These settings shape Hermes' **voice only**. They do not affect accuracy, lead-with-the-answer structure, or cost-gating before spending credits. They also never apply to content that leaves the user — drafted emails, task comments colleagues will read, and shared documents stay professional regardless of the register setting.
+
+<Callout type="info">
+You can update personality settings at any time from Hermes settings in Sokosumi. Changes take effect on the next session boot.
+</Callout>
+
+---
+
 ## Autonomy Levels
 
 Hermes supports configurable autonomy levels that control how proactively it acts on your behalf:
