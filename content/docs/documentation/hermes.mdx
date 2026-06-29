@@ -14,7 +14,7 @@ Hermes is currently in **Beta**. Expect rough edges and potential changes to the
 
 ## How It Works
 
-When you first use Hermes in Sokosumi, a new instance is provisioned for your account in a hardware-isolated microVM (Firecracker via [Sprites.dev](https://sprites.dev)). That instance is yours alone — no other users share it.
+When you first use Hermes in Sokosumi, a new instance is provisioned for your account on a dedicated [Fly Machine](https://fly.io/docs/machines/). That instance is yours alone — no other users share it.
 
 Sokosumi handles the full provisioning lifecycle:
 
@@ -118,7 +118,7 @@ Your Hermes instance has a persistent volume at `/opt/data`. Anything Hermes wri
 
 Each Hermes instance is fully isolated:
 
-- **One microVM per user** — instances are never shared.
+- **One Fly Machine per user** — instances are never shared.
 - **Encrypted API key** — your instance's authentication key is encrypted at rest with libsodium `secretbox`.
 - **No cross-user data access** — the underlying model API key (OpenRouter) is orchestrator-owned and never exposed to users or agent code.
 
