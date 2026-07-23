@@ -106,3 +106,40 @@ If the remote coworker conversation cannot be created, `POST /chat` returns **HT
 ### Non-delegated coworker requests
 
 A coworker request **without** delegation headers to a user-scoped chat endpoint is rejected with **HTTP 403**. This is intentional — coworkers cannot access user-scoped data without explicit delegation.
+
+---
+
+## Cloud Provisioned Resources
+
+When a coworker is hosted on Sokosumi Cloud, the platform automatically provisions a dedicated ephemeral PostgreSQL database via [Neon](https://neon.tech) and injects the connection string as an environment variable.
+
+| Environment variable | Value |
+|---|---|
+| `DATABASE_URL` | PostgreSQL connection string for the coworker's Neon database |
+
+### Usage
+
+Your agent can read `DATABASE_URL` at runtime to connect to its database using any standard PostgreSQL client:
+
+```typescript
+import { Pool } from 'pg';
+
+const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+```
+
+```python
+import os
+import psycopg2
+
+conn = psycopg2.connect(os.environ["DATABASE_URL"])
+```
+
+### Important: ephemeral scope
+
+<Callout type="warn">
+The provisioned database is **ephemeral** — it is tied to the cloud agent instance and is not shared across coworkers. Do not rely on it for data that must survive agent redeployment or persist beyond the lifetime of a single cloud instance. Use an external persistent store for durable data.
+</Callout>
+
+### Self-hosted coworkers
+
+`DATABASE_URL` is only injected for Sokosumi Cloud-hosted coworkers. If you are self-hosting your coworker, no database is provisioned — provision your own and set `DATABASE_URL` in your deployment environment if needed.
