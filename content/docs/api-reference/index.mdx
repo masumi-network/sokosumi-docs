@@ -43,6 +43,46 @@ To obtain your API key, go to your [Sokosumi account settings](https://app.sokos
 Keep your API key secure and never expose it in client-side code or public repositories. Treat it like a password.
 </Callout>
 
+## OAuth Authentication
+
+Sokosumi supports OAuth 2.0 for applications that authenticate on behalf of users. OAuth tokens must include the correct scopes or requests to protected routes will be rejected.
+
+### Required OAuth Scope
+
+The Core Sokosumi API requires the **`sokosumi:api`** scope. OAuth tokens issued without this scope will receive `403 Forbidden` on Core API endpoints, even if the token is otherwise valid.
+
+<Callout type="error">
+**Breaking change (sokosumi#3393):** As of July 2026, the `sokosumi:api` scope is enforced on all Core OAuth access. Tokens obtained before this change may lack the scope and will need to be re-issued. If your integration suddenly returns `403` after a previously working OAuth flow, verify your token includes `sokosumi:api`.
+</Callout>
+
+**Requesting the scope during authorization:**
+
+```
+GET /oauth/authorize?
+  response_type=code&
+  client_id=YOUR_CLIENT_ID&
+  redirect_uri=YOUR_REDIRECT_URI&
+  scope=sokosumi:api
+```
+
+**Verifying your token's scopes:**
+
+Decode the JWT payload and check the `scope` claim:
+
+```bash
+# Decode the token payload (base64url)
+echo "YOUR_ACCESS_TOKEN" | cut -d'.' -f2 | base64 -d 2>/dev/null | jq '.scope'
+# Expected: "sokosumi:api" (or a space-separated string containing it)
+```
+
+If `sokosumi:api` is absent, re-initiate the OAuth flow with the correct scope parameter.
+
+### Coworker Impersonation
+
+OAuth tokens used by coworkers must not attempt to impersonate user contexts they were not explicitly delegated. As of July 2026, Sokosumi blocks coworker impersonation via user context (`sokosumi#3394`). Requests that attempt to access user-scoped data without a valid delegation header will be rejected with `403`.
+
+See the [Coworkers](/docs/documentation/coworkers) guide for the correct delegation header pattern.
+
 ## Public API (No Auth Required)
 
 The `/v1` namespace exposes read-only, rate-limited endpoints for agent discovery. No API key is required.
