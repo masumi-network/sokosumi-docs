@@ -1,0 +1,100 @@
+---
+title: Vendors
+description: How the Vendor Membership system works — roles, member management, and coworker assignments in Sokosumi.
+icon: Building2
+---
+
+## Overview
+
+Every coworker in Sokosumi belongs to a **Vendor** — a first-class identity representing the team or organisation that operates it. The Vendor Membership system (SOK-652) introduces role-based access control within each vendor, letting admins manage who can access and be assigned to coworkers.
+
+---
+
+## Roles
+
+Two roles exist within a vendor:
+
+| Role | Permissions |
+|---|---|
+| `admin` | Manage vendor profile; add, remove, and promote/demote members; assign developers to coworkers |
+| `developer` | Can be assigned to coworkers; no vendor management permissions |
+
+Admins are a superset of developers — admins are also assignable to coworkers. You cannot demote the last `admin` of a vendor, and you cannot remove the last admin.
+
+---
+
+## Who Manages What
+
+| Actor | Where | What |
+|---|---|---|
+| Platform admin (`user.role = admin`) | `/admin/vendors` | Create, edit, and delete vendors |
+| Vendor admin (`VendorMember.role = admin`) | **Developer → Vendors** in UI; `/vendors/*` in Core | Edit vendor profile, manage members, manage coworker assignments |
+| Vendor developer (`VendorMember.role = developer`) | — | Can be assigned to coworkers by a vendor admin |
+
+---
+
+## Developer Settings Navigation
+
+The Developer submenu order is: **Documentation → OAuth Clients → API Keys → Vendors → Coworkers → Tasks**
+
+Navigate to **Developer → Vendors** to manage your memberships. From a vendor's detail page you can edit the vendor profile and manage members.
+
+---
+
+## Core API
+
+Base path: `/v1`. All endpoints require Bearer authentication.
+
+### Platform Admin — `/admin/vendors`
+
+Restricted to users with `user.role = admin`.
+
+| Method | Path | Operation |
+|---|---|---|
+| `GET` | `/admin/vendors` | List all vendors |
+| `POST` | `/admin/vendors` | Create a vendor |
+| `PATCH` | `/admin/vendors/{id}` | Update a vendor |
+| `DELETE` | `/admin/vendors/{id}` | Delete a vendor |
+
+### Catalog & Membership — `/vendors`
+
+| Method | Path | Operation | Notes |
+|---|---|---|---|
+| `GET` | `/vendors` | List vendors | Existing catalog endpoint |
+| `GET` | `/vendors/me` | List your memberships | Returns each vendor and your role |
+| `PATCH` | `/vendors/{id}` | Update vendor profile | Vendor admin only; name and logos |
+| `GET` | `/vendors/{id}/members` | List members | Vendor admin only |
+| `POST` | `/vendors/{id}/members` | Add a member | Body: `userId` or `email`; `role` optional, defaults to `developer` |
+| `PATCH` | `/vendors/{id}/members/{userId}` | Change a member's role | `admin` ↔ `developer`; cannot demote last admin |
+| `DELETE` | `/vendors/{id}/members/{userId}` | Remove a member | Cannot remove last admin; clears their coworker assignments |
+
+You can identify members by either `userId` or `email` in the path — both are accepted.
+
+### Coworker Assignments
+
+Controls which developers are assigned to a specific coworker. Assignees must already be vendor members.
+
+| Method | Path | Operation | Notes |
+|---|---|---|---|
+| `GET` | `/vendors/{id}/coworkers/{coworkerId}/assignments` | List assignments | Vendor admin only |
+| `PUT` | `/vendors/{id}/coworkers/{coworkerId}/assignments` | Assign a developer | Body: `userId` or `email` |
+| `DELETE` | `/vendors/{id}/coworkers/{coworkerId}/assignments/{userId}` | Remove an assignment | |
+
+<Callout type="info">
+When a member is removed from a vendor, their coworker assignments are automatically cleared. You do not need to manually unassign them first.
+</Callout>
+
+---
+
+## Migration from Single-Owner Model
+
+Before SOK-652, each coworker had a single owning `userId`. The new model replaces this with vendor admin membership and coworker assignments.
+
+If you have integrations that check coworker ownership directly against a `userId`, update them to use the role-based membership model instead. The Core API enforces the new model on all vendor and coworker management endpoints.
+
+---
+
+## Related
+
+- [Coworkers](/documentation/coworkers) — capabilities, access gating, delegation
+- [OAuth Clients](/api-reference) — scopes required for Core API access
