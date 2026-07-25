@@ -1,0 +1,183 @@
+---
+title: Orchestrator Context Access
+description: How orchestrator service tokens work with X-Context-* headers to access user-scoped routes on the Sokosumi Core API.
+icon: Workflow
+---
+
+## Overview
+
+Sokosumi supports two modes of orchestrator authentication:
+
+| Mode | Auth | What it can reach |
+|---|---|---|
+| **Bare orchestrator** | Service token, no context headers | Public/catalog routes only |
+| **Orchestrator + context** (`orch+ctx`) | Service token + `X-Context-*` headers | Most user-scoped routes, acting as the context user |
+
+The `orch+ctx` model allows Hermes (and any orchestrator you build on the service token API) to call Core routes as if the context user made the request — without requiring a browser session.
+
+---
+
+## Headers
+
+```http
+Authorization: Bearer <orchestrator-service-token>
+X-Context-User-Id: <user-id>
+X-Context-Organization-Id: <org-id>   # optional
+```
+
+When `X-Context-User-Id` is present, Sokosumi routes the request through the context user's identity. Membership and ownership checks still apply — the context user must have the appropriate permissions for the operation.
+
+<Callout type="warn">
+`X-Context-*` impersonation is scoped to the context user's own data. Orchestrators cannot elevate to admin, access other users' data, or bypass membership checks.
+</Callout>
+
+---
+
+## Access Matrix
+
+Routes under `/v1`.
+
+### Catalog & Agents
+
+| Route | Orch bare | Orch+ctx |
+|---|---|---|
+| `GET /agents` | ✅ | ✅ |
+| `GET /agents/{id}` | ✅ | ✅ |
+| `GET /agents/{id}/input-schema` | ✅ | ✅ |
+| `GET /agents/{id}/reviews` | ✅ | ✅ |
+| `GET /agents/{id}/jobs` | ❌ | ✅ |
+| `POST /agents/{id}/jobs` | ❌ | ✅ |
+| `GET /agents/{id}/ratings/eligibility` | ❌ | ✅ |
+| `POST /agents/{id}/ratings` | ❌ | ✅ |
+| `GET /agents/{id}/reviews/me` | ❌ | ✅ |
+| `GET /categories` | ✅ | ✅ |
+| `GET /coworkers/{id}` (catalog) | ✅ | ✅ |
+
+### Tasks
+
+| Route | Orch bare | Orch+ctx |
+|---|---|---|
+| `GET /tasks` | ❌ | ✅ |
+| `POST /tasks` | ❌ | ✅ |
+| `GET/PATCH/DELETE /tasks/{id}` | ❌ | ✅ |
+| `GET/POST /tasks/{id}/events` | ❌ | ✅ |
+| `GET /tasks/{id}/jobs` | ❌ | ✅ |
+| `GET/PUT /tasks/{id}/workspace` | ❌ | ✅ |
+| `GET/PUT/DELETE /tasks/{id}/schedule` | ❌ | ✅ |
+| `GET/PUT/DELETE /tasks/{id}/share` | ❌ | ✅ |
+| `GET/POST/PATCH/DELETE /tasks/{id}/links…` | ❌ | ✅ |
+| `POST /tasks/{id}/jobs` | ❌ | ❌ (coworker key only) |
+
+### Jobs, Projects & Workspaces
+
+| Domain | Orch bare | Orch+ctx |
+|---|---|---|
+| All `/jobs/*` | ❌ | ✅ |
+| All `/projects/*` | ❌ | ✅ |
+| `GET /workspaces/{id}` | ❌ | ✅ |
+| `GET /workspaces/design-md` | ❌ | ✅ |
+
+### Chat & Conversations
+
+| Route | Orch bare | Orch+ctx |
+|---|---|---|
+| `GET/POST /chat` | ❌ | ✅ |
+| `GET /chat/stream/{conversationId}` | ❌ | ✅ |
+| `GET/POST /conversations` | ❌ | ✅ |
+| `GET/PATCH /conversations/{id}` | ❌ | ✅ |
+| `PATCH /conversations/{id}/archive` | ❌ | ✅ |
+| `GET /conversations/{id}/warmup` | ❌ | ✅ |
+| `GET/POST /conversations/{id}/messages` | ❌ | ✅ |
+
+### Notifications & History
+
+| Route | Orch bare | Orch+ctx |
+|---|---|---|
+| `GET /notifications` | ❌ | ✅ |
+| `GET /notifications/unread-count` | ❌ | ✅ |
+| `PATCH /notifications/{id}/read` | ❌ | ✅ |
+| `PATCH /notifications/read-all` | ❌ | ✅ |
+| `GET /history` | ❌ | ✅ |
+
+### Users — `/users/{id|me}/*`
+
+The path must match the context user. Session admins can still target any user.
+
+| Route | Orch bare | Orch+ctx |
+|---|---|---|
+| `GET /users/{id}` | ❌ | ✅ |
+| `GET /users/{id}/credits` | ❌ | ✅ |
+| `GET /users/{id}/billing-details` | ❌ | ✅ |
+| `GET /users/{id}/members` | ❌ | ✅ |
+| `GET/POST /users/{id}/onboarding` | ❌ | ✅ |
+| `GET /users/{id}/organizations…` | ❌ | ✅ |
+| `GET/PATCH /users/{id}/preferences` | ❌ | ✅ |
+| `PUT /users/{id}/preferred-organization` | ❌ | ✅ |
+| `GET/POST /users/{id}/stripe-customer` | ❌ | ✅ |
+| `GET /users/{id}/subscription` | ❌ | ✅ |
+| `GET/PUT /users/{id}/design-md` | ❌ | ✅ |
+| `GET/POST /users/{id}/uploads` | ❌ | ✅ |
+| `GET/POST /users/{id}/notices…` | ❌ | ✅ |
+| `GET/POST /users/{id}/vendor-grants…` | ❌ | ✅ |
+
+### Organizations
+
+Membership checks apply to the context user.
+
+| Route | Orch bare | Orch+ctx |
+|---|---|---|
+| `GET /organizations/{id}` | ❌ | ✅ |
+| `GET /organizations/slug/{slug}` | ❌ | ✅ |
+| `GET /organizations/{id}/members` | ❌ | ✅ |
+| `GET /organizations/{id}/billing-details` | ❌ | ✅ |
+| `GET /organizations/{id}/billing-plan` | ❌ | ✅ |
+| `GET /organizations/{id}/subscription` | ❌ | ✅ |
+| `GET/POST /organizations/{id}/vendor-grants…` | ❌ | ✅ |
+
+### Vendors
+
+| Route | Orch bare | Orch+ctx |
+|---|---|---|
+| `GET /vendors` | ✅ | ✅ |
+
+---
+
+## Session-Only Routes
+
+These routes require a browser session. Orchestrator tokens — with or without context headers — are always rejected:
+
+| Group | Paths |
+|---|---|
+| Hermes product | All `/hermes/*` |
+| Checkout & billing | `/checkout/*`, `/products/*`, `/coupons/*` |
+| Developer console | `/developer/*` |
+| Vendor management | `/vendors/me`, member and assignment endpoints, `PATCH /vendors/{id}` |
+| Admin & enterprise | `/admin/*`, `/enterprise/*` |
+| Coworker management | `GET /coworkers`, api-keys, image, delete |
+
+<Callout type="info">
+`POST /tasks/{id}/jobs` accepts coworker keys only — not user sessions or orchestrator tokens.
+</Callout>
+
+---
+
+## What Changed in July 2026
+
+[sokosumi#3408](https://github.com/masumi-network/sokosumi/pull/3408) significantly expanded `orch+ctx` coverage. Before this change, orchestrators with context headers could only reach a narrow set of routes:
+
+| Route group | Before | After |
+|---|---|---|
+| Agent ratings & reviews | ❌ | ✅ |
+| GET task workspace | ❌ | ✅ |
+| `/users/{id\|me}/*` | ❌ | ✅ |
+| Chat / conversations | ❌ | ✅ |
+| Notifications | ❌ | ✅ |
+| History | ❌ | ✅ |
+| Organizations | ❌ | ✅ |
+
+---
+
+## Related
+
+- [Coworkers](/documentation/coworkers) — coworker delegation headers (`X-Context-*` outbound)
+- [API Reference](/api-reference) — OAuth scopes required for Core API access
