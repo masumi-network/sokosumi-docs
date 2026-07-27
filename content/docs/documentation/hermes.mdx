@@ -60,6 +60,45 @@ Autonomy level affects both the agent's behavior and how costs are accounted —
 
 ---
 
+## Long-Term Memory
+
+Hermes maintains two distinct types of memory across all your conversations:
+
+### Note Card (Active Memory)
+
+The note card is Hermes' working memory — a compact, always-present store of facts and context it needs right now. Examples:
+
+- Your name, role, and company
+- Ongoing projects and active preferences
+- Short-term context from recent conversations
+
+The note card is injected directly into Hermes' context at the start of every session. It is small by design — only the most immediately relevant facts are kept here.
+
+### Archive (Long-Term Memory)
+
+The archive is Hermes' long-term store. It holds the full history of observations, decisions, and learnings accumulated across all your conversations. Hermes queries the archive semantically when it needs to recall something specific — it is not injected in full every session.
+
+This means Hermes can remember things you told it weeks ago without that context counting against every response's token budget.
+
+### How Memory Works in Practice
+
+When you end a conversation, Hermes:
+1. Distills key facts and observations from the session
+2. Promotes durable facts to the note card
+3. Writes detailed observations to the archive
+
+On your next conversation, Hermes loads the note card immediately and queries the archive on demand as topics arise.
+
+<Callout type="info">
+Memory is per-user and fully isolated. Hermes' memory for your account is never shared with or accessible by other users.
+</Callout>
+
+<Callout type="warn">
+Long-term memory is a Beta feature. Memory contents are not user-exportable in this release. Memory state may be reset during significant infrastructure migrations — Hermes will notify you if this happens.
+</Callout>
+
+---
+
 ## Composio Integrations
 
 Hermes can connect to external services through [Composio](https://composio.dev) — a tool integration platform. Once connected, Hermes can use those services as tools inside your chat.
@@ -112,6 +151,8 @@ Your first conversation with Hermes may take up to 10 minutes to start while you
 
 Your Hermes instance has a persistent volume at `/opt/data`. Anything Hermes writes there survives across conversations and suspensions. This means Hermes can maintain context, preferences, and working data between sessions — unlike stateless chat completions.
 
+This filesystem persistence is separate from long-term memory — the `/opt/data` volume holds files and structured data Hermes writes explicitly, while the memory system (note card + archive) is managed automatically.
+
 ---
 
 ## Isolation and Security
@@ -121,6 +162,7 @@ Each Hermes instance is fully isolated:
 - **One microVM per user** — instances are never shared.
 - **Encrypted API key** — your instance's authentication key is encrypted at rest with libsodium `secretbox`.
 - **No cross-user data access** — the underlying model API key (OpenRouter) is orchestrator-owned and never exposed to users or agent code.
+- **Memory isolation** — your note card and archive are stored per-user and are never accessible to other Hermes instances.
 
 ---
 
@@ -131,6 +173,7 @@ Each Hermes instance is fully isolated:
 - Instance state is not backed up — data loss on underlying infrastructure failure is possible during Beta.
 - Cron-based task firing mirrors to Sokosumi tasks on preprod only (not yet on mainnet).
 - Hermes coworker delegation is not available in this Beta release.
+- Long-term memory contents are not user-exportable in this Beta release.
 
 ---
 
