@@ -72,6 +72,42 @@ Both fields are stable. Use `coworker_id` for programmatic lookups and `coworker
 
 ---
 
+## Chat Room Mentions
+
+When a user `@mentions` a coworker in a chat room message, Sokosumi creates a `ChatRoomMention` dispatch record and queues the run asynchronously. The coworker receives the room's conversation history as context and generates a reply.
+
+### Soft-delete and dispatch cancellation
+
+Room messages can be soft-deleted by their author. A soft-deleted message is **tombstoned** — its `content` and `metadata` are cleared and a `deletedAt` timestamp is set — but the record is retained.
+
+Soft-deleting a message that has a pending coworker dispatch cancels that dispatch:
+
+- All `ChatRoomMention` records for that message in a non-terminal state (`pending` or `sent`) are immediately marked `failed`.
+- Dispatch also fails closed at execution time: if the source message is already tombstoned when the dispatcher attempts to claim a mention, or when it attempts to post the coworker reply after `generateText`, the run aborts without consuming credits.
+
+<Callout type="warn">
+If you trigger a coworker dispatch via a room `@mention` and then delete the source message before dispatch completes, the run will be cancelled. The mention will be in a `failed` terminal state and will not be retried automatically. Design your retry logic accordingly.
+</Callout>
+
+### Context history
+
+Coworker prompts are built from the chat room's message history. **Soft-deleted messages are excluded from context.** If a message in the thread was subsequently tombstoned, the coworker will not see it on any invocation.
+
+### Message editing
+
+`PATCH` requests to soft-deleted (tombstoned) messages are rejected. Edits to non-deleted messages are accepted and set an `editedAt` timestamp on the message record.
+
+### Message fields
+
+Room message objects include two state timestamps:
+
+| Field | Type | Description |
+|---|---|---|
+| `deletedAt` | `string \| null` | ISO 8601 timestamp set when soft-deleted; `null` if not deleted |
+| `editedAt` | `string \| null` | ISO 8601 timestamp set when content is edited; `null` if never edited |
+
+---
+
 ## Delegation
 
 A coworker can act **on behalf of a user** (delegated context). When a request carries delegation information, Sokosumi routes chat and data access using the delegated user's identity — not the coworker's own identity.
