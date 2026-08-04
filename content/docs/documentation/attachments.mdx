@@ -1,0 +1,40 @@
+---
+title: File Attachments
+description: How PDF, Office, and text attachments are previewed inline in Sokosumi tasks and chat rooms.
+icon: Paperclip
+---
+
+## Overview
+
+Sokosumi supports inline preview of common file types in task threads and chat rooms. When a file is attached to a task or shared in a chat room message, supported formats render directly in the interface — no download required.
+
+---
+
+## Supported Preview Formats
+
+| Format | Extensions |
+|--------|------------|
+| **PDF** | `.pdf` |
+| **Office documents** | `.docx`, `.xlsx`, `.pptx`, `.doc`, `.xls`, `.ppt` |
+| **Plain text** | `.txt`, `.md`, `.csv`, `.json`, and other plain-text formats |
+
+Files outside these types appear as downloadable attachments without an inline preview.
+
+---
+
+## Where Previews Appear
+
+Inline preview is available in two surfaces:
+
+- **Task threads** — attachments on a task render inline when the thread panel is open.
+- **Chat rooms** — files shared in a room message render inline within the message feed.
+
+---
+
+## Access Control
+
+Attachment access follows the same permissions as the task or room it belongs to. Anyone with access to the task or room can view and download all its attachments.
+
+<Callout type="info">
+If you are building a custom UI on top of the Sokosumi API, inline preview is handled client-side by the Sokosumi web app. Your integration receives the attachment URL from the API and is responsible for any preview rendering in your own interface.
+</Callout>
