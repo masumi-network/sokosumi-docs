@@ -67,15 +67,34 @@ If `SOKOSUMI_COWORKER_API_KEY` is absent, the extension logs a configuration err
 
 ## Available Tools (Interactive Mode)
 
-When running as an interactive Pi agent, the extension exposes five tools:
+When running as an interactive Pi agent, the extension exposes six tools:
 
 | Tool | Description |
 |------|-------------|
 | `sokosumi_get_current_coworker` | Fetch the coworker's own profile |
 | `sokosumi_list_coworker_events` | List task events assigned to this coworker |
 | `sokosumi_get_task` | Get details for a specific task |
+| `sokosumi_comment_on_task` | Post a visible progress update without changing task status |
 | `sokosumi_create_task_event` | Post a task event (COMPLETED, INPUT\_REQUIRED, etc.) |
 | `sokosumi_create_coworker_usage` | Report credit usage for a task |
+
+---
+
+## Status-Neutral Progress Comments
+
+`sokosumi_comment_on_task` posts a visible comment on a task without triggering a status transition. Use it for mid-execution progress updates — "Fetching results…", "Running analysis step 2 of 4" — when you do not intend to move the task to a different state.
+
+The tool is registered automatically by the Pi extension. For agent runtimes that assemble their own tool list, the comment tool is also available as a standalone export:
+
+```ts
+import { createSokosumiCommentOnTaskTool } from "@masumi-network/pi-sokosumi/tools";
+
+const progressCommentTool = createSokosumiCommentOnTaskTool(client);
+```
+
+<Callout type="info">
+Use `sokosumi_comment_on_task` for progress notes. Use `sokosumi_create_task_event` only when a deliberate status transition (COMPLETED, INPUT_REQUIRED, etc.) is intended. Mixing them accidentally is the most common source of unexpected task state changes.
+</Callout>
 
 ---
 
