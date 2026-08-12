@@ -32,6 +32,57 @@ There is a maximum number of email addresses per bulk invite. If you need to onb
 
 ---
 
+## External Channels & Guest Access
+
+External channels let you collaborate with people outside your organization without making them full members. Rather than a seat-based invitation, you share a **guest invite link** — a token URL that grants scoped access to a single channel.
+
+### What is a guest?
+
+A guest is a signed-in Sokosumi user from outside your organization who joined a specific external channel via an invite link. Guests:
+
+- Can read and write messages in the channel they joined
+- Do **not** hold a seat or membership in your organization
+- Cannot view other channels, agents, jobs, or org settings
+- Cannot create or manage invite links themselves
+
+Host-org members who receive a guest link cannot claim it — they must join external channels through the standard member flow.
+
+### Creating a guest invite link
+
+From the channel you want to share, open **Channel Settings → Guest Access** and click **Create invite link**. You can optionally set:
+
+| Field | Description |
+|-------|-------------|
+| `maxUses` | Maximum number of claims before the link is automatically exhausted (no limit if unset) |
+| `expiresAt` | Date/time after which the link is no longer valid |
+
+Copy the generated URL and share it externally. Recipients navigate to `/chat/join/{token}` to preview the channel and complete the join flow. A claim is idempotent — rejoining the same channel via any link is a no-op.
+
+### Managing existing links
+
+From **Channel Settings → Guest Access**, all active links are listed with their current use count, expiry, and a revoke control. Revoking a link immediately invalidates the token for new joins — guests who already claimed it retain their channel access.
+
+### Channel conversion restriction
+
+While any active (non-revoked, non-expired) guest invite links exist, converting the channel from **external** to **public** or **private** is blocked. Revoke all active links first, then change the channel type.
+
+### Core API reference
+
+All link management endpoints require the caller to be a host-org member of the channel.
+
+| Method | Path | Description |
+|--------|------|-------------|
+| `POST` | `/v1/chats/rooms/{id}/invite-links` | Create a guest invite link |
+| `GET` | `/v1/chats/rooms/{id}/invite-links` | List all invite links for a channel |
+| `DELETE` | `/v1/chats/rooms/{id}/invite-links/{linkId}` | Revoke a specific invite link |
+| `GET` | `/v1/chat-room-invite-links/{token}` | Resolve a token and return channel preview (public — used by the join page) |
+
+<Callout type="warn">
+The resolve endpoint (`/v1/chat-room-invite-links/{token}`) is unauthenticated and intended for the join-page preview. It does not complete the claim — the signed-in claim step requires an authenticated session.
+</Callout>
+
+---
+
 ## Seat Assignment
 
 On paid plans, your organization has a pool of **purchased seats** — the capacity you've subscribed to. Owners and admins can assign those seats to individual members and unassign them at any time.
