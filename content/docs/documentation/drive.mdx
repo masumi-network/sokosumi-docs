@@ -1,0 +1,208 @@
+---
+title: Drive
+description: Store, retrieve, rename, and delete files in personal or organization Drive storage.
+icon: HardDrive
+---
+
+## Overview
+
+Drive is Sokosumi's managed file storage layer. It gives you persistent, URL-addressable file storage scoped either to a **personal** workspace (`scope=me`) or to an **organization** (`scope=org`). Files are publicly readable via their URL and managed through a four-operation API: mint (upload), list, rename, and delete.
+
+Drive uses [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) as its storage backend. File bytes travel directly from your client to Blob storage — they are never proxied through the Sokosumi API.
+
+---
+
+## Scopes
+
+| Scope | Value | Who can upload | Who can list / rename / delete |
+|---|---|---|---|
+| Personal | `me` | File owner only | File owner only |
+| Organization | `org` | Any org member | Any org member |
+
+---
+
+## Upload a file (mint)
+
+Uploading is a two-step process:
+
+**Step 1 — Mint an upload session**
+
+```bash
+curl -X POST https://api.sokosumi.com/v1/drive/files \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filename": "quarterly-report.pdf",
+    "contentType": "application/pdf",
+    "size": 204800,
+    "scope": "me"
+  }'
+```
+
+For an organization Drive, add `"scope": "org"` and `"organizationId": "org_abc123"`.
+
+Response (`201 Created`):
+
+```json
+{
+  "uploadUrl": "https://blob.vercel-storage.com/...",
+  "pathname": "drive/user/usr_xyz/quarterly-report.pdf",
+  "access": "public",
+  "method": "PUT",
+  "headers": {
+    "Content-Type": "application/pdf"
+  },
+  "expiresAt": "2026-08-20T13:00:00Z",
+  "maxSizeBytes": 10485760,
+  "addRandomSuffix": false
+}
+```
+
+**Step 2 — PUT raw bytes to the upload URL**
+
+```bash
+curl -X PUT "https://blob.vercel-storage.com/..." \
+  -H "Content-Type: application/pdf" \
+  --data-binary @quarterly-report.pdf
+```
+
+The file is immediately accessible via `fileUrl` once the PUT completes.
+
+<Callout type="info">
+Drive uses exact pathnames (`addRandomSuffix: false`). Uploading a file with the same name twice returns `409 Conflict`. Delete the existing file first, or rename it, before uploading a replacement.
+</Callout>
+
+### Request body
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `filename` | string | ✓ | Display name for the file |
+| `contentType` | string | ✓ | MIME type (see allowlist below) |
+| `size` | integer | ✓ | File size in bytes (max 10 MB) |
+| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Drive |
+| `organizationId` | string | if `scope=org` | Target organization ID |
+
+### Supported MIME types
+
+PDF, PNG, JPEG, GIF, WebP, SVG, plain text, and other standard user-upload types. The API returns `400 Bad Request` for unsupported types.
+
+---
+
+## List files
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=me" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+For an organization:
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=org&organizationId=org_abc123" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Response (`200 OK`):
+
+```json
+{
+  "data": [
+    {
+      "name": "quarterly-report.pdf",
+      "fileUrl": "https://blob.vercel-storage.com/drive/user/usr_xyz/quarterly-report.pdf",
+      "pathname": "drive/user/usr_xyz/quarterly-report.pdf",
+      "size": 204800,
+      "uploadedAt": "2026-08-20T12:00:00Z"
+    }
+  ],
+  "meta": {
+    "cursor": null,
+    "limit": 20,
+    "total": 1,
+    "nextCursor": null
+  }
+}
+```
+
+### Query parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Drive |
+| `organizationId` | string | if `scope=org` | Organization ID |
+| `q` | string | — | Case-sensitive prefix search on filename |
+| `cursor` | string | — | Pagination cursor from previous response |
+| `limit` | integer | — | Page size (default 20) |
+
+Results are returned in lexicographic order by pathname. `total` is only included on the final page (when `nextCursor` is `null` and no cursor was sent).
+
+---
+
+## Rename a file
+
+```bash
+curl -X PATCH https://api.sokosumi.com/v1/drive/files/rename/rename \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "oldPathname": "drive/user/usr_xyz/quarterly-report.pdf",
+    "newFilename": "q3-2026-report.pdf"
+  }'
+```
+
+Response (`200 OK`):
+
+```json
+{
+  "name": "q3-2026-report.pdf",
+  "fileUrl": "https://blob.vercel-storage.com/drive/user/usr_xyz/q3-2026-report.pdf",
+  "pathname": "drive/user/usr_xyz/q3-2026-report.pdf",
+  "size": 204800,
+  "uploadedAt": "2026-08-20T12:00:00Z"
+}
+```
+
+<Callout type="warning">
+Rename is implemented as copy-to-new-pathname then delete-old. The `fileUrl` changes. Any hardcoded references to the old URL will break.
+</Callout>
+
+Returns `409 Conflict` if the target filename already exists.
+
+---
+
+## Delete a file
+
+```bash
+curl -X DELETE https://api.sokosumi.com/v1/drive/files/delete/delete \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"pathname": "drive/user/usr_xyz/q3-2026-report.pdf"}'
+```
+
+Response: `204 No Content`
+
+---
+
+## API summary
+
+| Method | Path | Description |
+|---|---|---|
+| `POST` | `/v1/drive/files` | Mint an upload session |
+| `GET` | `/v1/drive/files` | List files (personal or org) |
+| `PATCH` | `/v1/drive/files/{id}/rename` | Rename a file |
+| `DELETE` | `/v1/drive/files/{id}/delete` | Delete a file |
+
+All endpoints require **user authentication**.
+
+---
+
+## Error reference
+
+| Status | Meaning |
+|---|---|
+| `400` | Invalid scope, unsupported MIME type, or bad request body |
+| `403` | Not the file owner (personal) or not an org member (org) |
+| `404` | File not found |
+| `409` | Target pathname already exists (upload or rename) |
+| `413` | File exceeds maximum size (10 MB) |
+| `503` | Blob storage not configured |
