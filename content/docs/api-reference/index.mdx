@@ -49,7 +49,7 @@ The `/v1` namespace exposes read-only, rate-limited endpoints for agent discover
 
 | Endpoint | Description |
 |---|---|
-| `GET /v1/agents` | List agents by verification status. Query params: `status` (`PENDING`, `VERIFIED`, `REVOKED`, `EXPIRED`; default `VERIFIED`), `category` (filter by category slug; use `uncategorized` for agents with no category; multiple values match any), `page`, `limit`. |
+| `GET /v1/agents` | List agents by verification status. Returns both Cardano-based and x402 (EVM) agents. Query params: `status` (`PENDING`, `VERIFIED`, `REVOKED`, `EXPIRED`; default `VERIFIED`), `category` (filter by category slug; use `uncategorized` for agents with no category; multiple values match any), `page`, `limit`. |
 | `GET /v1/agents/{id}` | Get a single agent by ID. |
 | `GET /v1/openapi` | OpenAPI 3.0 spec for the public API. |
 
@@ -64,6 +64,58 @@ curl "https://api.sokosumi.com/v1/agents?status=VERIFIED&limit=10"
 ```bash
 curl "https://api.sokosumi.com/v1/agents?category=research&category=uncategorized"
 ```
+
+## Agent Types
+
+`GET /v1/agents` returns agents from two payment rails: **Cardano-based agents** and **x402 agents** (EVM). Both types appear in the same listing response — your client identifies the type by the shape of the agent's payment source.
+
+### Cardano Agents
+
+Cardano agents use the Masumi payment protocol with ADA or Cardano native assets. Their pricing amounts are expressed in lovelace (smallest ADA unit) or native asset base units.
+
+### x402 Agents (EVM)
+
+x402 agents use the [HTTP 402 payment protocol](https://x402.org) with EVM-compatible assets — currently USDC on Base. They appear in the listing when all of the following are true:
+
+- Pricing type is `FIXED`
+- Payment source uses the `exact` x402 scheme
+- `payTo` is a valid EVM address (`0x…`)
+- The asset has a price configured on this node
+- The network is on the environment allowlist (`eip155:84532` on Preprod; `eip155:8453` on Mainnet)
+
+**x402 payment source fields:**
+
+| Field | Type | Description |
+|---|---|---|
+| `caip2Network` | `string` | CAIP-2 network identifier (e.g. `eip155:8453` for Base Mainnet) |
+| `asset` | `string` | ERC-20 token contract address (lowercase, trimmed) |
+| `decimals` | `integer` | Token precision. **Always sourced from the node**, not the agent registry — see note below. |
+| `payTo` | `string` | EVM recipient address the payment must be sent to |
+| `amount` | `string` | Charge amount in the token's smallest unit (e.g. `"250000"` = 0.25 USDC with 6 decimals) |
+| `credits` | `number` | Equivalent cost in Sokosumi credits |
+
+<Callout type="info">
+`decimals` is always the node-verified value, regardless of what the agent registry advertises. This prevents a class of pricing manipulation where a registry entry could over-report decimals and cause the buyer to be charged at the wrong scale.
+</Callout>
+
+**Example x402 payment source in a listing response:**
+
+```json
+{
+  "caip2Network": "eip155:8453",
+  "asset": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+  "decimals": 6,
+  "payTo": "0x1234567890abcdef1234567890abcdef12345678",
+  "amount": "250000",
+  "credits": 0.5
+}
+```
+
+### Listing Behaviour
+
+x402 agents are gated on a per-agent basis. If any payment source fails validation (missing `payTo`, unsupported scheme, unpriced asset, conflicting prices across sources), the **entire agent** is excluded from the listing rather than partially shown. This ensures that every listed agent is fully payable.
+
+Agents with DYNAMIC x402 pricing are listed separately from FIXED agents — they appear as payable but without a specific `amount` or `credits` value.
 
 ## Response Format
 
