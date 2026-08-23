@@ -1,0 +1,177 @@
+---
+title: Admin — x402 Payments
+description: Operator endpoints for listing, inspecting, and manually resolving x402 task payments.
+---
+
+## Overview
+
+These endpoints are available to **platform administrators only** and require an interactive admin session (not an API key). They surface x402 payment state for observability, support triage, and manual resolution of stuck payments.
+
+<Callout type="warn">
+The signed x402 payment authorization header is a **bearer instrument**. It is never returned by any of these endpoints — not even to admins. Use the payment `id` and `transactionId` for dispute resolution and audit.
+</Callout>
+
+## Payment Lifecycle
+
+```
+PENDING ──── node settles ────→ VERIFIED ──── goodwill refund ──→ REFUNDED
+     │                                                                ↑
+     ├──── node refuses ───────→ FAILED                              │
+     │                                                               │
+     └──── operator resolve ─────────────────────────────────────────┘
+```
+
+- **PENDING** — authorization signed; settlement in progress
+- **VERIFIED** — x402 header accepted and settled by the payment node
+- **FAILED** — node refused the authorization (e.g. insufficient funds, expired)
+- **REFUNDED** — compensating credit refund minted. `refundKind` distinguishes cause:
+  - `OPERATOR_GOODWILL` — paid but got a bad result (quality signal)
+  - `OPERATOR_RESOLVE` — support cleared a wedged `PENDING` row (not a quality signal)
+
+---
+
+## List x402 Payments
+
+```http
+GET /v1/admin/task-x402-payments
+```
+
+Cursor-paginated list of x402 payment records for observability and support.
+
+### Query parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `limit` | integer | Page size (default: 20) |
+| `cursor` | string | Cursor from a previous page's `nextCursor` |
+| `status` | string | Filter by status: `PENDING`, `VERIFIED`, `FAILED`, `REFUNDED` |
+| `agentId` | string | Filter by agent ID (1–128 chars) |
+| `caip2Network` | string | Filter by CAIP-2 network, e.g. `eip155:84532` (1–64 chars) |
+
+### Response fields
+
+| Field | Description |
+|---|---|
+| `id` | Payment record ID |
+| `status` | Current payment status |
+| `taskId` | The task this payment is attached to |
+| `agentId` | The coworker/agent that was paid |
+| `caip2Network` | CAIP-2 network identifier |
+| `asset` | Token contract address |
+| `amount` | Amount in token base units (string) |
+| `payTo` | Payee address |
+| `creditsCharged` | Credits debited from the task owner's balance |
+| `failureReason` | Populated when `status` is `FAILED` |
+| `refundKind` | `OPERATOR_GOODWILL` or `OPERATOR_RESOLVE` when `status` is `REFUNDED` |
+| `signAttemptCount` | Number of signing attempts made |
+| `signRiskExpiresAt` | When the risk window for a discarded authorization expires (null if none) |
+| `validBefore` | Authorization expiry timestamp |
+| `transactionId` | Credit ledger debit transaction ID |
+| `refundTransactionId` | Credit ledger refund transaction ID (when `REFUNDED`) |
+
+---
+
+## Aggregate by Agent
+
+```http
+GET /v1/admin/task-x402-payments/aggregate
+```
+
+Per-agent payment rollup for identifying quality-bleeding coworker endpoints. Results are ranked worst-first by `goodwillRefundCount` then `failureCount`.
+
+### Query parameters
+
+Same as list: `status`, `agentId`, `caip2Network`.
+
+### Response fields
+
+| Field | Description |
+|---|---|
+| `agentId` | Agent identifier |
+| `total` | Total payment rows matching filters |
+| `pending` | Rows in `PENDING` status |
+| `verified` | Rows in `VERIFIED` status |
+| `failed` | Rows in `FAILED` status |
+| `refunded` | Rows in `REFUNDED` status |
+| `failureCount` | Durable failure count from the action ledger (survives account deletion) |
+| `goodwillRefundCount` | Goodwill refunds (`OPERATOR_GOODWILL`) — the quality ranking signal |
+| `operatorResolveCount` | Support-cleared `PENDING` rows (`OPERATOR_RESOLVE`) — excluded from quality ranking |
+
+<Callout type="info">
+`goodwillRefundCount` drives the quality ranking. It counts `VERIFIED → REFUNDED` transitions where the coworker delivered a bad result. `operatorResolveCount` counts support-cleared stuck payments and is deliberately excluded from ranking — a bad actor could otherwise wedge `PENDING` charges to inflate a competitor's score.
+</Callout>
+
+---
+
+## Refund a Verified Payment (Goodwill)
+
+```http
+POST /v1/admin/task-x402-payments/{id}/refund
+```
+
+Issues a goodwill refund for a `VERIFIED` payment — use this when a coworker was paid but delivered an unsatisfactory result. Flips the payment to `REFUNDED` (`refundKind: OPERATOR_GOODWILL`), mints a compensating credit refund, and writes an operator audit row.
+
+**Valid on `VERIFIED` records only.** `FAILED` and `REFUNDED` rows are already compensated (409 `not_refundable`). `PENDING` rows must use the resolve endpoint instead.
+
+Idempotent — calling this on an already-refunded payment returns 409 `already_refunded`, which is safe to ignore.
+
+### Request body
+
+```json
+{
+  "reason": "agent_output_quality"
+}
+```
+
+### Conflict response `kind` values
+
+| `kind` | Meaning |
+|---|---|
+| `already_refunded` | Already compensated — idempotent, safe to ignore |
+| `not_refundable` | Wrong status — check `status` before calling |
+
+---
+
+## Resolve a Wedged Pending Payment
+
+```http
+POST /v1/admin/task-x402-payments/{id}/resolve
+```
+
+Support lever for a `PENDING` payment that is stuck and will never settle — e.g. a node timeout, an ambiguous x402 response, or a user account deletion blocked by the row. Flips it to `REFUNDED` (`refundKind: OPERATOR_RESOLVE`), mints a compensating credit refund, and writes an operator audit row.
+
+**Valid on `PENDING` records only.** `VERIFIED` rows may still settle on-chain (use the refund endpoint for post-settlement goodwill). `FAILED` and `REFUNDED` are already compensated (409 `already_resolved`).
+
+The resolve is refused while the **sign lease is active** or while a **discarded authorization may still be live** within its validity window. In both cases, the 409 response includes `retryAfter` (ISO timestamp) and `retryAfterSeconds` indicating when it is safe to retry.
+
+Idempotent — `already_resolved` is safe to ignore.
+
+### Request body
+
+```json
+{
+  "reason": "node_timeout"
+}
+```
+
+### Conflict response `kind` values
+
+| `kind` | Meaning | Retry? |
+|---|---|---|
+| `already_resolved` | Already compensated | No — idempotent |
+| `sign_in_flight` | Signing in progress | Yes — after `retryAfter` |
+| `sign_outcome_unresolved` | Discarded authorization may still be live | Yes — after `retryAfter` |
+| `not_resolvable` | Wrong status — `VERIFIED`/`FAILED`/`REFUNDED` | No |
+
+---
+
+## Account Deletion Blockers
+
+When a user account deletion is blocked by an x402 payment, Sentry fires an alert with the blocker code and — for `TASK_X402_PAYMENT_PENDING` — the resolve endpoint path.
+
+| Blocker code | Cause | Resolution |
+|---|---|---|
+| `TASK_X402_PAYMENT_PENDING` | A `PENDING` payment row is attached to the user | Use `POST /v1/admin/task-x402-payments/{id}/resolve` |
+| `TASK_X402_PAYMENT_UNRESOLVED` | Payment in a non-terminal, unhandled status | Contact engineering |
+| `TASK_X402_PAYMENT_AUTHORIZATION_LIVE` | A signed authorization is still within its validity window | Wait for expiry, then retry deletion |
+| `TASK_X402_PAYMENT_BILLING_OWNER_MISMATCH` | Charge and task ownership mismatch | Manual DB repair — no endpoint clears this; align `Task.ownerId` with the charge transaction's `userId` |
