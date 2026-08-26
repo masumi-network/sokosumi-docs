@@ -1,14 +1,14 @@
 ---
-title: Drive
-description: Store, retrieve, rename, and delete files in personal or organization Drive storage.
+title: Files
+description: Store, retrieve, rename, and delete files in personal or organization Files storage.
 icon: HardDrive
 ---
 
 ## Overview
 
-Drive is Sokosumi's managed file storage layer. It gives you persistent, URL-addressable file storage scoped either to a **personal** workspace (`scope=me`) or to an **organization** (`scope=org`). Files are publicly readable via their URL and managed through a four-operation API: mint (upload), list, rename, and delete.
+Files is Sokosumi's managed file storage layer. It gives you persistent, URL-addressable file storage scoped either to a **personal** workspace (`scope=me`) or to an **organization** (`scope=org`). Files are publicly readable via their URL and managed through a four-operation API: mint (upload), list, rename, and delete.
 
-Drive uses [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) as its storage backend. File bytes travel directly from your client to Blob storage — they are never proxied through the Sokosumi API.
+Files uses [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) as its storage backend. File bytes travel directly from your client to Blob storage — they are never proxied through the Sokosumi API.
 
 ---
 
@@ -39,7 +39,7 @@ curl -X POST https://api.sokosumi.com/v1/drive/files \
   }'
 ```
 
-For an organization Drive, add `"scope": "org"` and `"organizationId": "org_abc123"`.
+For an organization Files storage, add `"scope": "org"` and `"organizationId": "org_abc123"`.
 
 Response (`201 Created`):
 
@@ -69,7 +69,7 @@ curl -X PUT "https://blob.vercel-storage.com/..." \
 The file is immediately accessible via `fileUrl` once the PUT completes.
 
 <Callout type="info">
-Drive uses exact pathnames (`addRandomSuffix: false`). Uploading a file with the same name twice returns `409 Conflict`. Delete the existing file first, or rename it, before uploading a replacement.
+Files uses exact pathnames (`addRandomSuffix: false`). Uploading a file with the same name twice returns `409 Conflict`. Delete the existing file first, or rename it, before uploading a replacement.
 </Callout>
 
 ### Request body
@@ -79,7 +79,7 @@ Drive uses exact pathnames (`addRandomSuffix: false`). Uploading a file with the
 | `filename` | string | ✓ | Display name for the file |
 | `contentType` | string | ✓ | MIME type (see allowlist below) |
 | `size` | integer | ✓ | File size in bytes (max 10 MB) |
-| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Drive |
+| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Files storage |
 | `organizationId` | string | if `scope=org` | Target organization ID |
 
 ### Supported MIME types
@@ -128,7 +128,7 @@ Response (`200 OK`):
 
 | Parameter | Type | Required | Description |
 |---|---|---|---|
-| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Drive |
+| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Files storage |
 | `organizationId` | string | if `scope=org` | Organization ID |
 | `q` | string | — | Case-sensitive prefix search on filename |
 | `cursor` | string | — | Pagination cursor from previous response |
