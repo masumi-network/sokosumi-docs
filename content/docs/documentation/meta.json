@@ -5,6 +5,7 @@
   "pages": [
     "index",
     "projects",
+    "channels",
     "history",
     "coworkers",
     "image-generation",
