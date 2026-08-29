@@ -1,0 +1,158 @@
+---
+title: Soko Bot (Beta)
+description: Per-workspace AI assistant that works your Taskboard, reads connected mail and calendar, and reports in chat.
+icon: Bot
+---
+
+## Overview
+
+Soko Bot is a first-party AI personal assistant built into Sokosumi. It operates per **workspace** — each workspace gets its own bot — and is designed to work alongside your Coworkers on the Taskboard, read connected email and calendar accounts, and deliver proactive updates in chat.
+
+Soko Bot is currently in **Beta**, available to whitelisted accounts.
+
+<Callout type="info">
+Soko Bot replaced Hermes. If you were using Hermes, your workflow now lives in Soko Bot. The underlying infrastructure is different — Soko Bot runs inside Sokosumi Core rather than a separate compute environment.
+</Callout>
+
+---
+
+## Getting Started
+
+Navigate to **Soko Bots** (`/soko-bots`) to see all bots in your workspace.
+
+**Creating a bot:**
+
+1. Click **Create** and give your bot a name and mascot.
+2. After a short reveal screen, the bot's direct chat opens and it introduces itself.
+3. The bot is now active for your workspace.
+
+Each workspace has one bot. Bots are scoped to the workspace they were created in — they cannot access other workspaces.
+
+---
+
+## Taskboard Integration
+
+Soko Bot can be assigned tasks from your Taskboard, just like a Coworker.
+
+| Capability | Detail |
+|---|---|
+| **Assigned tasks** | Owner assigns a task to the bot; the bot works it using `update_assigned_task`. Assigned tasks are mandatory work and spend the owner's credits. Only the task owner can assign to their bot. |
+| **Task watching** | The bot follows tasks it created and comments when it holds information the task lacks. |
+| **Comment limit** | Max 3 comments per day per task, to avoid noise. |
+
+---
+
+## Chat and Drive Tools
+
+Soko Bot has access to the following tools, bounded to the owner's workspace:
+
+**Chat tools** — rooms the bot's Coworker belongs to in its own workspace:
+- `list_chats` — list available chat rooms
+- `read_chat` — read messages in a room
+- `post_chat` — post a message
+
+**Drive tools** — scoped to the owner's Drive:
+- `list_files` — list Drive files
+- `upload_file` — upload a file
+
+<Callout type="warn">
+The bot never sends email. Mail integrations are read-only ingest only.
+</Callout>
+
+---
+
+## Proactive Behaviors
+
+Soko Bot can act autonomously on a schedule. The owner sets a **daily cap** on proactive activity.
+
+| Rhythm | Description |
+|---|---|
+| **Weekday stand-up** | A morning summary of active tasks and calendar events |
+| **Friday wrap** | End-of-week summary |
+| **Stuck-work nudges** | Deterministic nudges when tasks stall, bounded by the daily cap |
+
+All proactive behaviors respect the daily cap. Schedules and nudge settings are configurable from the **Assistant Console**.
+
+---
+
+## Assistant Console
+
+Each bot has a console page with:
+
+- **Daily activity** — what the bot did today
+- **Automated-check status** — whether proactive rhythms are running
+- **Recent activity** — a log of recent actions
+- **Skills** — available tool sets
+- **Connected accounts** — linked Composio integrations
+- **Schedules** — proactive rhythm configuration
+- **Memory** — persistent facts the bot has stored
+- **Settings** — name, mascot, autonomy controls
+
+---
+
+## Composio Integrations
+
+Soko Bot can connect to external services through [Composio](https://composio.dev):
+
+| Integration | Access |
+|---|---|
+| Gmail | Read-only ingest |
+| Outlook | Read-only ingest |
+| Google Calendar | Read-only ingest |
+| Other toolkits | Via `list_integration_tools` / `run_integration_tool` |
+
+To connect an integration, go to **Connected accounts** in the Assistant Console and complete the OAuth or API key flow.
+
+<Callout type="warn">
+Mail and calendar integrations are **read-only**. The bot has no send, reply, or delete capability for email.
+</Callout>
+
+---
+
+## Teammate Access
+
+A teammate (someone other than the bot's owner) can mention a bot in a shared room. The response is scoped:
+
+| What the teammate sees | What the teammate does NOT see |
+|---|---|
+| Status reads | Durable memory |
+| Basic task summaries | Prior turn history |
+| | Approval queue |
+| | Credit balance |
+
+Responses to teammates are published into the shared room, so nothing owner-private may reach them.
+
+---
+
+## Safety and Security
+
+- Every tool call re-checks the capability grant, turn status, workspace membership, and any administrator pause before executing.
+- The runtime authenticates as the owning user — it holds no separate credentials.
+- `SOKO_BOT_ENABLED` gates all routes and sync jobs.
+
+---
+
+## Administrator Controls
+
+Platform administrators have access to a fleet page at `/admin/soko-bots`. From there, admins can:
+
+- **Kill switch** — pause all Soko Bot activity across the platform with an optional reason. The reason is surfaced to bot owners; Core returns a `503` instead of a `404` so owners see "temporarily unavailable" rather than "feature doesn't exist".
+- **Turn trace** — inspect any turn's full event log, model usage, tool call history, and delegation chain for debugging.
+
+The kill switch takes effect immediately without a redeployment (stored in the database, not an environment variable).
+
+---
+
+## Known Limitations (Beta)
+
+- Beta access is currently limited to whitelisted accounts.
+- Owner approval for paid work is not yet enforced — the approval flow exists but is not gated.
+- Cancelling a turn stops further tool calls but does not abort an in-flight model call.
+- Organization seat enforcement does not cover Soko Bot's Core API routes.
+- Mobile layout was verified by markup audit, not at phone width.
+
+---
+
+## Feedback
+
+Soko Bot is Beta software. File issues at [github.com/masumi-network/sokosumi-docs/issues](https://github.com/masumi-network/sokosumi-docs/issues) or reach out on [Discord](https://discord.gg/masumi).
