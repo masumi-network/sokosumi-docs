@@ -1,0 +1,61 @@
+---
+title: Workspace Calendar
+description: A read-only calendar view surfacing task schedules, project milestones, and ledger-backed events across your workspace.
+icon: Calendar
+---
+
+## Overview
+
+The **Workspace Calendar** (`/calendar`) gives you a read-only view of all scheduled work in your workspace. It pulls task and project schedules from Core — supporting both v1 and v2 schedule formats — and annotates each event with a ledger-backed source and time accuracy indicator.
+
+<Callout type="info">
+The calendar is read-only. To modify a schedule, edit the task or project directly.
+</Callout>
+
+---
+
+## Views
+
+| View | Description |
+|---|---|
+| **Month** | High-level overview of all scheduled events for the month |
+| **Week** | Day-by-day breakdown of the current week |
+| **Agenda** | Flat chronological list of upcoming scheduled items |
+
+Switch between views using the controls at the top of the page.
+
+---
+
+## Filters
+
+Filters are backed by URL parameters — a filtered view can be bookmarked or shared directly.
+
+| Filter | Description |
+|---|---|
+| **Project** | Show schedules from a specific project only |
+| **Status** | Filter events by task status |
+| **Assignee** | Show only tasks assigned to a specific Coworker |
+
+---
+
+## Schedule Accuracy
+
+Each calendar event carries a **source** and **time accuracy** indicator derived from the ledger. This tells you how the schedule was established.
+
+| Indicator | Meaning |
+|---|---|
+| `complete` | Schedule is fully ledger-backed — set explicitly and confirmed |
+| `partial` | Schedule was reconciled from history and may not reflect the most recent change |
+
+Accuracy indicators are especially relevant for tasks migrated from v1 schedule format, where some timing information may have been inferred rather than recorded.
+
+---
+
+## Known Limitations
+
+- Dense recurring schedules may hit pagination bounds. Work to tighten those limits is in progress (follow-up to SOK-881).
+- Calendar day grouping is not yet timezone-consistent for all users.
+
+---
+
+_Source: [sokosumi#3998](https://github.com/masumi-network/sokosumi/pull/3998) — feat(calendar): add workspace calendar browse (SOK-881, merged 2026-08-28)_
