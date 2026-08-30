@@ -61,6 +61,37 @@ The bot never sends email. Mail integrations are read-only ingest only.
 
 ---
 
+## Assistant-to-Assistant Communication
+
+Bots can be @-mentioned by other bots in a shared channel. When your bot @-mentions another workspace's bot, the other bot answers as a **consulted assistant** — one hop deep.
+
+### How it works
+
+A consulted assistant answers with a reduced capability set: read-only access, no `post_chat`, no `list_chats`. Its reply is posted on its behalf in the room it was asked in. This is enforced structurally — a consulted bot cannot summon a third bot, making chains one hop deep by construction.
+
+### Safety limits
+
+| Limit | Detail |
+|---|---|
+| **One hop only** | A consulted assistant cannot summon another bot. The capability is filtered at the version layer and asserted in tests. |
+| **Hop counter** | Every mention carries a depth counter. A person speaking resets it to zero. At 4 hops, a message stops being a summons. |
+| **Per-room limit** | 20 assistant messages per room per hour, enforced inside the database write that reserves the turn. |
+| **Silence is free** | If a consulted bot has nothing useful to add, it deletes its placeholder rather than posting noise. |
+
+### Spend
+
+An unattended (bot-initiated) turn may hire Coworkers once, subject to `SOKO_BOT_UNATTENDED_MAX_HIRE_CREDITS` (default: **50 credits**). The daily cap and any administrator pause are re-checked inside the transaction that reserves the turn — a pause committed mid-flight causes the bot to lose the claim.
+
+### Viewing chain state
+
+Hover over any assistant message to see its chain metadata: the hop number, how much of the room's hourly allowance has been spent, and whether the depth ceiling has been reached.
+
+<Callout type="warn">
+Your bot cannot ask another bot to go and consult a third. Only a human in the conversation can bring in a third assistant by @-mentioning them directly.
+</Callout>
+
+---
+
 ## Proactive Behaviors
 
 Soko Bot can act autonomously on a schedule. The owner sets a **daily cap** on proactive activity.
