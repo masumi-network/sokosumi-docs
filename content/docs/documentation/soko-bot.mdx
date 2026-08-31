@@ -44,12 +44,13 @@ Soko Bot can be assigned tasks from your Taskboard, just like a Coworker.
 
 ## Chat and Drive Tools
 
-Soko Bot has access to the following tools, bounded to the owner's workspace:
+Soko Bot has access to the following tools, bounded to the owner's workspace (or the owner's organization for direct chats):
 
-**Chat tools** — rooms the bot's Coworker belongs to in its own workspace:
+**Chat tools:**
 - `list_chats` — list available chat rooms
 - `read_chat` — read messages in a room
-- `post_chat` — post a message
+- `post_chat` — post a message to an existing room
+- `open_direct_chat` — open a new direct chat with an org member and send an opening message
 
 **Drive tools** — scoped to the owner's Drive:
 - `list_files` — list Drive files
@@ -57,6 +58,27 @@ Soko Bot has access to the following tools, bounded to the owner's workspace:
 
 <Callout type="warn">
 The bot never sends email. Mail integrations are read-only ingest only.
+</Callout>
+
+### Opening Direct Chats
+
+`open_direct_chat` lets a bot reach someone in its owner's organization directly — no shared room required. A bot told "message Nina about the contract" does it, rather than saying it has no way to reach her.
+
+**Safety limits:**
+
+| Limit | Detail |
+|---|---|
+| **Owner-turn only** | Fires only when the bot's owner is the initiating user. Never triggered by a schedule or by another bot's request. |
+| **Max 5 new rooms per turn** | A single turn cannot open more than 5 new direct chats. |
+| **Org members only** | Target must be a member of the bot's organization. |
+| **No bot-to-bot directs** | A bot cannot open a direct room with another assistant. |
+| **No duplicate owner room** | Cannot open a second direct room with the bot's owner. |
+| **Permanent rooms** | Direct chats cannot be left once created — this is the edge case the limits are built around. |
+
+**Name resolution:** A first name matches display names; full names disambiguate when two people share a first name. If names still collide, the bot asks rather than guessing. Email addresses in a request match on address rather than display name, preventing accidental matches against colleagues whose display name looks like an email.
+
+<Callout type="warn">
+Direct chat rooms are permanent. Once created, no party can leave. The per-turn cap and org-member scope exist specifically because of this.
 </Callout>
 
 ---
@@ -103,6 +125,32 @@ Soko Bot can act autonomously on a schedule. The owner sets a **daily cap** on p
 | **Stuck-work nudges** | Deterministic nudges when tasks stall, bounded by the daily cap |
 
 All proactive behaviors respect the daily cap. Schedules and nudge settings are configurable from the **Assistant Console**.
+
+---
+
+## Usage & Cost
+
+The **Soko Bots page** (`/soko-bots`) shows a lifetime usage card for each bot.
+
+| Metric | Description |
+|---|---|
+| **Credits** | Total billable credits consumed. Credits lead the display — this is what leaves your balance. |
+| **Tokens** | Total token count across all model calls for the bot's lifetime. |
+| **Model cost** | Raw provider cost (USD). Does not reconcile with credits: `SOKO_BOT_MIN_TURN_CREDITS` applies a floor per turn, so a turn costing a fraction of a cent still charges the minimum. The card surfaces this gap rather than hiding it. |
+
+**What is metered — three model calls can occur per turn:**
+
+| Call | When it runs |
+|---|---|
+| **Agent loop** | Every turn (the main reasoning and tool-call step). |
+| **Classifier** | Once per turn that doesn't match a deterministic intent rule. |
+| **Judge** | Every production turn; retries once when structured output parses empty. |
+
+All three are counted in the usage card. Each call is metered before its output is parsed — a call that burns tokens but returns unusable output still registers in the total.
+
+> Historical turns from before this feature shipped show `0` overhead cost. The previously discarded usage is not recoverable, so a floor of zero is noted rather than backfilled with estimates.
+
+**Admin view:** Platform administrators see the same credit, token, and model cost figures on the bot's detail page at `/admin/soko-bots`.
 
 ---
 
@@ -169,6 +217,7 @@ Platform administrators have access to a fleet page at `/admin/soko-bots`. From 
 
 - **Kill switch** — pause all Soko Bot activity across the platform with an optional reason. The reason is surfaced to bot owners; Core returns a `503` instead of a `404` so owners see "temporarily unavailable" rather than "feature doesn't exist".
 - **Turn trace** — inspect any turn's full event log, model usage, tool call history, and delegation chain for debugging.
+- **Usage details** — per-bot credit, token, and model cost summary (same figures as the owner's usage card).
 
 The kill switch takes effect immediately without a redeployment (stored in the database, not an environment variable).
 
