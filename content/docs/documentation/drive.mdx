@@ -1,104 +1,23 @@
 ---
-title: Files
-description: Store, retrieve, rename, and delete files in personal or organization Files storage.
+title: Drive
+description: Browse and manage files in your personal or organization Drive in Sokosumi.
 icon: HardDrive
 ---
 
 ## Overview
 
-Files is Sokosumi's managed file storage layer. It gives you persistent, URL-addressable file storage scoped either to a **personal** workspace (`scope=me`) or to an **organization** (`scope=org`). Files are publicly readable via their URL and managed through a four-operation API: mint (upload), list, rename, and delete.
-
-Files uses [Vercel Blob](https://vercel.com/docs/storage/vercel-blob) as its storage backend. File bytes travel directly from your client to Blob storage — they are never proxied through the Sokosumi API.
+Drive is Sokosumi's integrated file storage layer. Each user has a personal Drive (`scope=me`), and each organization has a shared Drive (`scope=org`). Files are organized in folders and can be browsed, searched, uploaded, renamed, and deleted through the API.
 
 ---
 
-## Scopes
+## Browsing Drive
 
-| Scope | Value | Who can upload | Who can list / rename / delete |
-|---|---|---|---|
-| Personal | `me` | File owner only | File owner only |
-| Organization | `org` | Any org member | Any org member |
+`GET /v1/drive/files` returns items (folders and files) at a single folder level.
 
----
-
-## Upload a file (mint)
-
-Uploading is a two-step process:
-
-**Step 1 — Mint an upload session**
-
-```bash
-curl -X POST https://api.sokosumi.com/v1/drive/files \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "filename": "quarterly-report.pdf",
-    "contentType": "application/pdf",
-    "size": 204800,
-    "scope": "me"
-  }'
-```
-
-For an organization Files storage, add `"scope": "org"` and `"organizationId": "org_abc123"`.
-
-Response (`201 Created`):
-
-```json
-{
-  "uploadUrl": "https://blob.vercel-storage.com/...",
-  "pathname": "drive/user/usr_xyz/quarterly-report.pdf",
-  "access": "public",
-  "method": "PUT",
-  "headers": {
-    "Content-Type": "application/pdf"
-  },
-  "expiresAt": "2026-08-20T13:00:00Z",
-  "maxSizeBytes": 10485760,
-  "addRandomSuffix": false
-}
-```
-
-**Step 2 — PUT raw bytes to the upload URL**
-
-```bash
-curl -X PUT "https://blob.vercel-storage.com/..." \
-  -H "Content-Type: application/pdf" \
-  --data-binary @quarterly-report.pdf
-```
-
-The file is immediately accessible via `fileUrl` once the PUT completes.
-
-<Callout type="info">
-Files uses exact pathnames (`addRandomSuffix: false`). Uploading a file with the same name twice returns `409 Conflict`. Delete the existing file first, or rename it, before uploading a replacement.
-</Callout>
-
-### Request body
-
-| Field | Type | Required | Description |
-|---|---|---|---|
-| `filename` | string | ✓ | Display name for the file |
-| `contentType` | string | ✓ | MIME type (see allowlist below) |
-| `size` | integer | ✓ | File size in bytes (max 10 MB) |
-| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Files storage |
-| `organizationId` | string | if `scope=org` | Target organization ID |
-
-### Supported MIME types
-
-PDF, PNG, JPEG, GIF, WebP, SVG, plain text, and other standard user-upload types. The API returns `400 Bad Request` for unsupported types.
-
----
-
-## List files
+### Basic browse
 
 ```bash
 curl "https://api.sokosumi.com/v1/drive/files?scope=me" \
-  -H "Authorization: Bearer YOUR_API_KEY"
-```
-
-For an organization:
-
-```bash
-curl "https://api.sokosumi.com/v1/drive/files?scope=org&organizationId=org_abc123" \
   -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
@@ -107,79 +26,132 @@ Response (`200 OK`):
 ```json
 {
   "data": [
+    { "type": "folder", "name": "Reports", "path": "Reports" },
     {
-      "name": "quarterly-report.pdf",
-      "fileUrl": "https://blob.vercel-storage.com/drive/user/usr_xyz/quarterly-report.pdf",
-      "pathname": "drive/user/usr_xyz/quarterly-report.pdf",
-      "size": 204800,
-      "uploadedAt": "2026-08-20T12:00:00Z"
+      "type": "file",
+      "name": "brief.pdf",
+      "fileUrl": "https://...",
+      "pathname": "drive/users/u123/brief.pdf",
+      "size": 24832,
+      "uploadedAt": "2026-08-15T10:00:00.000Z"
     }
   ],
   "meta": {
-    "cursor": null,
-    "limit": 20,
-    "total": 1,
-    "nextCursor": null
+    "pagination": {
+      "cursor": null,
+      "limit": 50,
+      "nextCursor": null
+    }
   }
 }
 ```
 
+Folders always appear before files. Default order (no `sortBy`): folders first, then files alphabetically by name within the current storage page.
+
 ### Query parameters
 
-| Parameter | Type | Required | Description |
-|---|---|---|---|
-| `scope` | `"me"` \| `"org"` | ✓ | Personal or organization Files storage |
-| `organizationId` | string | if `scope=org` | Organization ID |
-| `q` | string | — | Case-sensitive prefix search on filename |
-| `cursor` | string | — | Pagination cursor from previous response |
-| `limit` | integer | — | Page size (default 20) |
-
-Results are returned in lexicographic order by pathname. `total` is only included on the final page (when `nextCursor` is `null` and no cursor was sent).
+| Parameter | Type | Description |
+|---|---|---|
+| `scope` | `me` \| `org` | Personal or organization Drive. Required. |
+| `organizationId` | string | Required when `scope=org`. |
+| `folder` | string | Subfolder path to browse (e.g. `Reports/Q3`). Omit for root. |
+| `q` | string | Filename prefix filter (case-sensitive). Applied before sort. |
+| `sortBy` | `name` \| `date` \| `type` | Sort key. Omit for default page-local name order. |
+| `sortOrder` | `asc` \| `desc` | Sort direction. Works alongside `sortBy`. |
+| `limit` | integer | Page size (default: 50). |
+| `cursor` | string | Opaque cursor from a previous page's `meta.pagination.nextCursor`. |
 
 ---
 
-## Rename a file
+## Sorting
+
+By default, Drive returns items in page-local order — folders then files, each name ascending. This is the fast path: one storage query per request.
+
+When you pass `sortBy`, Drive switches to **global sort mode**: it reads the entire current folder into memory, sorts it, and paginates with a signed cursor. Order is stable across pages regardless of how many items there are.
+
+### Sort keys
+
+| `sortBy` | Files sorted by | Tiebreaker |
+|---|---|---|
+| `name` | Display name (locale-aware) | — |
+| `date` | `uploadedAt` timestamp | Name |
+| `type` | File type family rank, then name | — |
+
+Folders always appear before files regardless of sort key or direction.
+
+### File type families (`sortBy=type`)
+
+Files are bucketed into type families and ranked in this order (ascending):
+
+`image` → `video` → `audio` → `pdf` → `document` → `spreadsheet` → `presentation` → `archive` → `code` → `text` → `other`
+
+Family is determined by MIME type first, then file extension. Within the same family, files are sorted by name.
+
+### Sorting with pagination
 
 ```bash
-curl -X PATCH https://api.sokosumi.com/v1/drive/files/rename/rename \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "oldPathname": "drive/user/usr_xyz/quarterly-report.pdf",
-    "newFilename": "q3-2026-report.pdf"
-  }'
-```
+# First page — newest files first
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&sortBy=date&sortOrder=desc&limit=25" \
+  -H "Authorization: Bearer YOUR_API_KEY"
 
-Response (`200 OK`):
-
-```json
-{
-  "name": "q3-2026-report.pdf",
-  "fileUrl": "https://blob.vercel-storage.com/drive/user/usr_xyz/q3-2026-report.pdf",
-  "pathname": "drive/user/usr_xyz/q3-2026-report.pdf",
-  "size": 204800,
-  "uploadedAt": "2026-08-20T12:00:00Z"
-}
+# Next page — pass cursor from meta.pagination.nextCursor
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&sortBy=date&sortOrder=desc&limit=25&cursor=CURSOR" \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
 <Callout type="warning">
-Rename is implemented as copy-to-new-pathname then delete-old. The `fileUrl` changes. Any hardcoded references to the old URL will break.
+**Cursors are sort-bound.** A cursor from one set of sort parameters cannot be used with different `sortBy` or `sortOrder` values — the API returns `400 Bad Request`. Always pass the same sort params throughout a paginated sequence.
 </Callout>
 
-Returns `409 Conflict` if the target filename already exists.
+<Callout type="info">
+**Large folder limit.** Global sort reads the entire folder from storage. Folders exceeding approximately 100,000 files return `422 Unprocessable Entity`:
+`"This folder is too large to sort globally. Omit sortBy to use page-local ordering."`
+
+For very large folders, omit `sortBy` and apply client-side sorting within each page.
+</Callout>
 
 ---
 
-## Delete a file
+## Navigating subfolders
+
+Use the `folder` parameter to browse into a subfolder:
 
 ```bash
-curl -X DELETE https://api.sokosumi.com/v1/drive/files/delete/delete \
-  -H "Authorization: Bearer YOUR_API_KEY" \
-  -H "Content-Type: application/json" \
-  -d '{"pathname": "drive/user/usr_xyz/q3-2026-report.pdf"}'
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&folder=Reports%2FQ3" \
+  -H "Authorization: Bearer YOUR_API_KEY"
 ```
 
-Response: `204 No Content`
+Each request returns items at exactly one level — there is no recursive listing. The `path` field on folder items gives the subfolder name to pass as `folder` in the next request.
+
+---
+
+## Searching
+
+The `q` parameter applies a case-sensitive prefix filter at the current folder level:
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&q=brief" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Search and sort can be combined: `q` filters the set first, then `sortBy` orders the filtered results.
+
+---
+
+## Organization Drive
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=org&organizationId=org_abc123" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Organization Drive requires workspace membership. Standard coworker access rules apply.
+
+---
+
+## Task file lists
+
+The file list for individual tasks supports the same `sortBy` and `sortOrder` parameters with one difference: `sortBy=type` is not available on task file lists and falls back to name sort.
 
 ---
 
@@ -187,22 +159,6 @@ Response: `204 No Content`
 
 | Method | Path | Description |
 |---|---|---|
-| `POST` | `/v1/drive/files` | Mint an upload session |
-| `GET` | `/v1/drive/files` | List files (personal or org) |
-| `PATCH` | `/v1/drive/files/{id}/rename` | Rename a file |
-| `DELETE` | `/v1/drive/files/{id}/delete` | Delete a file |
+| `GET` | `/v1/drive/files` | Browse items at current folder level |
 
-All endpoints require **user authentication**.
-
----
-
-## Error reference
-
-| Status | Meaning |
-|---|---|
-| `400` | Invalid scope, unsupported MIME type, or bad request body |
-| `403` | Not the file owner (personal) or not an org member (org) |
-| `404` | File not found |
-| `409` | Target pathname already exists (upload or rename) |
-| `413` | File exceeds maximum size (10 MB) |
-| `503` | Blob storage not configured |
+All endpoints require **user authentication** and a valid **workspace context**.
