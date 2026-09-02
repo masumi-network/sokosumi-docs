@@ -1,0 +1,164 @@
+---
+title: Drive
+description: Browse and manage files in your personal or organization Drive in Sokosumi.
+icon: HardDrive
+---
+
+## Overview
+
+Drive is Sokosumi's integrated file storage layer. Each user has a personal Drive (`scope=me`), and each organization has a shared Drive (`scope=org`). Files are organized in folders and can be browsed, searched, uploaded, renamed, and deleted through the API.
+
+---
+
+## Browsing Drive
+
+`GET /v1/drive/files` returns items (folders and files) at a single folder level.
+
+### Basic browse
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=me" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Response (`200 OK`):
+
+```json
+{
+  "data": [
+    { "type": "folder", "name": "Reports", "path": "Reports" },
+    {
+      "type": "file",
+      "name": "brief.pdf",
+      "fileUrl": "https://...",
+      "pathname": "drive/users/u123/brief.pdf",
+      "size": 24832,
+      "uploadedAt": "2026-08-15T10:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "pagination": {
+      "cursor": null,
+      "limit": 50,
+      "nextCursor": null
+    }
+  }
+}
+```
+
+Folders always appear before files. Default order (no `sortBy`): folders first, then files alphabetically by name within the current storage page.
+
+### Query parameters
+
+| Parameter | Type | Description |
+|---|---|---|
+| `scope` | `me` \| `org` | Personal or organization Drive. Required. |
+| `organizationId` | string | Required when `scope=org`. |
+| `folder` | string | Subfolder path to browse (e.g. `Reports/Q3`). Omit for root. |
+| `q` | string | Filename prefix filter (case-sensitive). Applied before sort. |
+| `sortBy` | `name` \| `date` \| `type` | Sort key. Omit for default page-local name order. |
+| `sortOrder` | `asc` \| `desc` | Sort direction. Works alongside `sortBy`. |
+| `limit` | integer | Page size (default: 50). |
+| `cursor` | string | Opaque cursor from a previous page's `meta.pagination.nextCursor`. |
+
+---
+
+## Sorting
+
+By default, Drive returns items in page-local order — folders then files, each name ascending. This is the fast path: one storage query per request.
+
+When you pass `sortBy`, Drive switches to **global sort mode**: it reads the entire current folder into memory, sorts it, and paginates with a signed cursor. Order is stable across pages regardless of how many items there are.
+
+### Sort keys
+
+| `sortBy` | Files sorted by | Tiebreaker |
+|---|---|---|
+| `name` | Display name (locale-aware) | — |
+| `date` | `uploadedAt` timestamp | Name |
+| `type` | File type family rank, then name | — |
+
+Folders always appear before files regardless of sort key or direction.
+
+### File type families (`sortBy=type`)
+
+Files are bucketed into type families and ranked in this order (ascending):
+
+`image` → `video` → `audio` → `pdf` → `document` → `spreadsheet` → `presentation` → `archive` → `code` → `text` → `other`
+
+Family is determined by MIME type first, then file extension. Within the same family, files are sorted by name.
+
+### Sorting with pagination
+
+```bash
+# First page — newest files first
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&sortBy=date&sortOrder=desc&limit=25" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Next page — pass cursor from meta.pagination.nextCursor
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&sortBy=date&sortOrder=desc&limit=25&cursor=CURSOR" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+<Callout type="warning">
+**Cursors are sort-bound.** A cursor from one set of sort parameters cannot be used with different `sortBy` or `sortOrder` values — the API returns `400 Bad Request`. Always pass the same sort params throughout a paginated sequence.
+</Callout>
+
+<Callout type="info">
+**Large folder limit.** Global sort reads the entire folder from storage. Folders exceeding approximately 100,000 files return `422 Unprocessable Entity`:
+`"This folder is too large to sort globally. Omit sortBy to use page-local ordering."`
+
+For very large folders, omit `sortBy` and apply client-side sorting within each page.
+</Callout>
+
+---
+
+## Navigating subfolders
+
+Use the `folder` parameter to browse into a subfolder:
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&folder=Reports%2FQ3" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Each request returns items at exactly one level — there is no recursive listing. The `path` field on folder items gives the subfolder name to pass as `folder` in the next request.
+
+---
+
+## Searching
+
+The `q` parameter applies a case-sensitive prefix filter at the current folder level:
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=me&q=brief" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Search and sort can be combined: `q` filters the set first, then `sortBy` orders the filtered results.
+
+---
+
+## Organization Drive
+
+```bash
+curl "https://api.sokosumi.com/v1/drive/files?scope=org&organizationId=org_abc123" \
+  -H "Authorization: Bearer YOUR_API_KEY"
+```
+
+Organization Drive requires workspace membership. Standard coworker access rules apply.
+
+---
+
+## Task file lists
+
+The file list for individual tasks supports the same `sortBy` and `sortOrder` parameters with one difference: `sortBy=type` is not available on task file lists and falls back to name sort.
+
+---
+
+## API summary
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/v1/drive/files` | Browse items at current folder level |
+
+All endpoints require **user authentication** and a valid **workspace context**.
