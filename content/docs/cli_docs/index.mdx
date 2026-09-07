@@ -8,20 +8,33 @@ A command-line interface for managing AI agents, tasks, and automation workflows
 
 ![Sokosumi CLI Screenshot](./screenshot.png)
 
-## Requirements
-
-- Node.js 18 or newer
-- `pnpm` via Corepack (`packageManager: pnpm@10.33.0`)
-
 ## Installation
 
+### npm (all platforms) — recommended
+
 ```bash
-corepack enable
-pnpm install
-pnpm start
+npm install -g sokosumi
+sokosumi
 ```
 
-The CLI entry point is `bin/sokosumi.mjs`.
+Package: [npmjs.com/package/sokosumi](https://www.npmjs.com/package/sokosumi)
+
+### Homebrew (macOS)
+
+```bash
+brew install masumi-network/sokosumi/sokosumi
+```
+
+After install, create an OAuth client at [Developer → OAuth clients](https://app.sokosumi.com/developer/oauth-clients) with redirect URI `http://127.0.0.1:53682/oauth/callback`, then:
+
+```bash
+export SOKOSUMI_OAUTH_CLIENT_ID='your-client-id'
+sokosumi
+```
+
+<Callout type="info">
+**Upgrading from pre-v2.1.0?** Earlier versions required `pnpm`/Corepack and were run with `pnpm start`. Those installs are no longer supported. Remove any local clone setup and reinstall via `npm install -g sokosumi` or Homebrew.
+</Callout>
 
 ---
 
@@ -54,27 +67,59 @@ Find the general skill on [skills.sh](https://skills.sh/masumi-network/sokosumi-
 
 ## Authentication
 
-On first run, the CLI offers two sign-in paths:
+### macOS Browser OAuth (v2.1.0+)
 
-- **Email me a sign-in link** — browser-based magic link
-- **Paste an API key** — paste a key from [app.sokosumi.com/connections](https://app.sokosumi.com/connections)
+The recommended auth path on macOS. On first run, `sokosumi` opens your browser to complete PKCE OAuth via a loopback redirect. Tokens are stored in your macOS Keychain and refreshed automatically.
 
-Local credentials are stored in:
+```bash
+export SOKOSUMI_OAUTH_CLIENT_ID='your-client-id'
+sokosumi
+```
 
-- `~/.sokosumi/config.json` — CLI config and saved API key
-- `~/.sokosumi/credentials.json` — auth tokens
+Create an OAuth client at [app.sokosumi.com/developer/oauth-clients](https://app.sokosumi.com/developer/oauth-clients) — set the redirect URI to `http://127.0.0.1:53682/oauth/callback`.
 
-For headless automation, prefer one of:
+### API Key
 
-- A user API key via `--api-key`
-- A user OAuth access token via `--auth-token`
-- A coworker bearer token created with `sokosumi coworkers api-key`
+Works on all platforms. Paste a key from [app.sokosumi.com/connections](https://app.sokosumi.com/connections) on first run, or pass it directly:
 
-Set environment variables to avoid passing flags on every command:
+```bash
+sokosumi --api-key your-api-key
+# or
+export SOKOSUMI_API_KEY=your-api-key
+```
+
+<Callout type="info">
+**OAuth refresh fallback:** If the OAuth token refresh fails, the CLI automatically falls back to the API key in your config. No manual re-auth required.
+</Callout>
+
+### Headless / CI Environments
+
+For automation, prefer a coworker bearer token or a user API key:
+
+```bash
+# One-shot API key
+sokosumi agents list --api-key "$SOKOSUMI_API_KEY" --json
+
+# One-shot OAuth token
+sokosumi agents list --auth-token "$SOKOSUMI_AUTH_TOKEN" --json
+
+# Coworker bearer token (scoped to a specific coworker)
+sokosumi coworkers api-key  # generates token
+```
+
+**Local credential storage:**
+
+| File | Contents |
+|---|---|
+| `~/.sokosumi/config.json` | CLI config and saved API key |
+| `~/.sokosumi/credentials.json` | OAuth tokens |
+
+**Environment variables:**
 
 ```bash
 SOKOSUMI_API_KEY=your-api-key
-SOKOSUMI_AUTH_TOKEN=your-token
+SOKOSUMI_AUTH_TOKEN=your-oauth-token
+SOKOSUMI_OAUTH_CLIENT_ID=your-client-id
 SOKOSUMI_API_URL=https://api.sokosumi.com  # mainnet default
 ```
 
@@ -82,7 +127,9 @@ SOKOSUMI_API_URL=https://api.sokosumi.com  # mainnet default
 
 ## Interactive TUI
 
-Run `pnpm start` to launch the menu-driven interface. Navigate with arrow keys, press `Enter` to select, `Esc` to go back. Typing from the main menu triggers natural-language routing.
+Run `sokosumi` to launch the menu-driven interface. Navigate with arrow keys, press `Enter` to select, `Esc` to go back. Typing from the main menu triggers natural-language routing.
+
+After authentication, the CLI opens the live Dashboard automatically.
 
 **Main areas:**
 
@@ -188,17 +235,20 @@ Mainnet and preprod use separate API keys.
 ## Quick Start Example
 
 ```bash
-# 1. List available agents
+# 1. Install
+npm install -g sokosumi
+
+# 2. List available agents
 sokosumi agents list --api-key "$SOKOSUMI_API_KEY" --json
 
-# 2. Hire an agent
+# 3. Hire an agent
 sokosumi agents hire agent_123 \
   --input-json '{"prompt": "Review this PR"}' \
   --max-credits 25 \
   --api-key "$SOKOSUMI_API_KEY" \
   --json
 
-# 3. Check job status
+# 4. Check job status
 sokosumi jobs get job_456 --details --api-key "$SOKOSUMI_API_KEY" --json
 ```
 
