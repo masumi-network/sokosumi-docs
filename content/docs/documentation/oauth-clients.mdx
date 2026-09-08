@@ -1,0 +1,147 @@
+---
+title: OAuth Clients
+description: Create and manage OAuth 2.0 clients in the Sokosumi Developer section — public PKCE clients for native apps and confidential clients for server-side integrations.
+icon: KeyRound
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+The **Developer** section at [app.sokosumi.com/developer](https://app.sokosumi.com/developer) lets you create and manage OAuth 2.0 clients for integrating third-party applications with Sokosumi.
+
+---
+
+## Client types
+
+Sokosumi supports two client types, chosen at creation. **The type cannot be changed after creation.**
+
+| Type | Secret | Use case |
+|---|---|---|
+| **Confidential** (default) | Yes — issued once on creation | Server-side web apps that can securely store a secret |
+| **Public** | No — PKCE only | Native apps, desktop apps, mobile apps that cannot keep a secret |
+
+---
+
+## Creating an OAuth client
+
+1. Go to [app.sokosumi.com/developer](https://app.sokosumi.com/developer)
+2. Click **Create OAuth Client**
+3. Fill in the form:
+   - **Name** — displayed to users on the consent screen
+   - **Redirect URIs** — one URI per line (see [redirect URI rules](#redirect-uri-rules) below)
+   - **Allow Sokosumi API access** — adds the `sokosumi:api` scope (checked: user can call the Core API; unchecked: identity only)
+   - **Allow refresh tokens** — adds `offline_access`; client may receive refresh tokens valid for up to ~90 days
+   - **Public client (no secret, PKCE only)** — check this for native or mobile apps
+
+### After creation
+
+**Confidential client:** a `client_secret` is shown **once**. Save it immediately — it cannot be retrieved again.
+
+**Public client:** no secret is issued. You'll see:
+> "Public client created — no secret was issued. Use the client ID with PKCE (S256)."
+
+---
+
+## Scopes
+
+| Scope | Description | Enabled by |
+|---|---|---|
+| `openid` | Identity (always included) | Always |
+| `sokosumi:api` | Call the Core API as the user | ✅ Allow Sokosumi API access |
+| `offline_access` | Receive refresh tokens | ✅ Allow refresh tokens |
+
+---
+
+## Redirect URI rules
+
+Redirect URIs must follow one of two patterns depending on your application type:
+
+**Web apps** — standard HTTPS URLs:
+```
+https://myapp.example.com/oauth/callback
+```
+
+**Native / desktop apps** — reverse-domain custom URI scheme with a **single slash** after the colon:
+```
+com.example.myapp:/oauth/callback   ✅ correct
+com.example.myapp://oauth/callback  ❌ two slashes — rejected
+myapp://oauth/callback              ❌ not reverse-domain — rejected
+```
+
+You can register multiple redirect URIs by entering one per line.
+
+<Callout type="info">
+Sokosumi auto-detects `application_type: native` when all redirect URIs use a custom scheme. This enables the correct PKCE flow for native clients.
+</Callout>
+
+---
+
+## Using PKCE with a public client
+
+Public clients use the **Authorization Code flow with PKCE (S256)**. No `client_secret` is sent — the code verifier/challenge pair replaces it.
+
+### Flow summary
+
+```
+1. Generate a code_verifier (random 43–128 char string)
+2. Compute code_challenge = base64url(SHA256(code_verifier))
+3. Redirect user to the authorize endpoint:
+
+GET https://api.sokosumi.com/oauth2/authorize
+  ?client_id=YOUR_CLIENT_ID
+  &redirect_uri=com.example.myapp:/oauth/callback
+  &response_type=code
+  &scope=openid sokosumi:api offline_access
+  &code_challenge=BASE64URL_SHA256_OF_VERIFIER
+  &code_challenge_method=S256
+
+4. User authorizes → redirect back with ?code=AUTH_CODE
+5. Exchange code for tokens (no client_secret, use code_verifier instead):
+
+POST https://api.sokosumi.com/oauth2/token
+  grant_type=authorization_code
+  &client_id=YOUR_CLIENT_ID
+  &redirect_uri=com.example.myapp:/oauth/callback
+  &code=AUTH_CODE
+  &code_verifier=YOUR_VERIFIER
+```
+
+### Token response
+
+```json
+{
+  "access_token": "...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "id_token": "...",
+  "refresh_token": "..."   // only if offline_access was granted
+}
+```
+
+---
+
+## Editing and deleting clients
+
+- **Edit** — you can update the name, redirect URIs, and scope settings at any time. Client type (public/confidential) is immutable.
+- **Rotate secret** — available for confidential clients only. Generates a new secret and invalidates the old one.
+- **Delete** — removes the client. Existing tokens issued to that client stop working immediately.
+
+---
+
+## Editing scope settings
+
+Scope changes take effect immediately on the client's allow-list:
+
+- **Turning off API access** — blocks Core API access for existing tokens immediately
+- **Turning off refresh tokens** — removes `offline_access` from the allow-list; users must reauthorize to get new refresh tokens
+- **Turning on either** — requires users to reauthorize before tokens include the new scope
+
+---
+
+## Client list badges
+
+Each client in the list shows:
+
+- **Public** or **Confidential** — client type
+- **API access** or **Identity only** — scope level
+- **Refresh token** — if offline access is enabled
+
