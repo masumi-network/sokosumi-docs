@@ -1,0 +1,97 @@
+---
+title: Workspace Calendar
+description: A calendar view for scheduling and managing task occurrences across your workspace — with support for drag-and-drop, reschedule, and series revision safety.
+icon: Calendar
+---
+
+## Overview
+
+The **Workspace Calendar** (`/calendar`) surfaces all scheduled work in your workspace: task schedules, project milestones, and ledger-backed events pulled from Core. It supports both v1 and v2 schedule formats, and annotates each event with a source and time accuracy indicator.
+
+As of 2026-09-13, the calendar supports **interactive occurrence management** — you can drag, reschedule, and edit individual occurrences or entire series without affecting unrelated events.
+
+---
+
+## Views
+
+| View | Description |
+|---|---|
+| **Month** | High-level overview of all scheduled events for the month |
+| **Week** | Day-by-day breakdown of the current week |
+| **Agenda** | Flat chronological list of upcoming scheduled items |
+
+Switch between views using the controls at the top of the page.
+
+---
+
+## Filters
+
+Filters are backed by URL parameters — a filtered view can be bookmarked or shared directly.
+
+| Filter | Description |
+|---|---|
+| **Project** | Show schedules from a specific project only |
+| **Status** | Filter events by task status |
+| **Assignee** | Show only tasks assigned to a specific Coworker |
+
+---
+
+## Occurrence Management
+
+Calendar events that belong to a recurring series support three editing operations. These let you adjust individual occurrences without touching the rest of the series.
+
+### Drag and Move an Occurrence
+
+Drag any occurrence to a new time slot on the calendar. Only that occurrence moves — the rest of the series stays on its original schedule.
+
+<Callout type="info">
+Dragging preserves the occurrence's duration. To change the duration, use the reschedule dialog instead.
+</Callout>
+
+### Reschedule an Occurrence
+
+Click an occurrence and choose **Reschedule this event** to open the reschedule dialog. You can change the start time, end time, and date for that occurrence only.
+
+The rescheduled occurrence is stored as an exception to the series rule. Other occurrences are unaffected.
+
+### Manage a Series
+
+Click an occurrence and choose **Edit series** to open the series management dialog. From here you can:
+
+- Change the recurrence pattern (frequency, interval, end date)
+- Update the title, assignee, or status for the whole series
+
+**Revision safety:** When you save a series change, occurrences that have already been individually rescheduled or completed are preserved as-is. Only future, unmodified occurrences are updated to the new series rule. This prevents past exceptions from being silently overwritten.
+
+<Callout type="warning">
+Editing the series does not retroactively apply changes to past occurrences. If you need to correct a past occurrence, edit it individually.
+</Callout>
+
+---
+
+## Schedule Accuracy
+
+Each calendar event carries a **time accuracy** indicator derived from the ledger.
+
+| Indicator | Meaning |
+|---|---|
+| `complete` | Schedule is fully ledger-backed — set explicitly and confirmed |
+| `partial` | Schedule was reconciled from history and may not reflect the most recent change |
+
+Accuracy indicators are especially relevant for tasks migrated from v1 schedule format, where some timing information may have been inferred rather than recorded.
+
+---
+
+## Known Limitations
+
+- Dense recurring schedules may hit pagination bounds — in progress as a follow-up to SOK-881.
+- Calendar day grouping is not yet timezone-consistent for all users.
+- Dragging an occurrence across a month boundary in Month view is not yet supported — use the reschedule dialog instead.
+
+---
+
+_Sources:_
+- _[sokosumi#3998](https://github.com/masumi-network/sokosumi/pull/3998) — feat(calendar): add workspace calendar browse (SOK-881, merged 2026-08-28)_
+- _[sokosumi#4463](https://github.com/masumi-network/sokosumi/pull/4463) — feat(calendar): drag and move one occurrence (merged 2026-09-13)_
+- _[sokosumi#4460](https://github.com/masumi-network/sokosumi/pull/4460) — feat(calendar): reschedule one occurrence (merged 2026-09-13)_
+- _[sokosumi#4311](https://github.com/masumi-network/sokosumi/pull/4311) — feat(calendar): manage series with revision safety (merged 2026-09-13)_
