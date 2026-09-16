@@ -82,6 +82,47 @@ A job or task can belong to **at most one project** at a time. Reassigning requi
 
 ---
 
+## Task Visibility
+
+Tasks in organization workspaces support two visibility levels:
+
+| Visibility | Default? | Who can see it |
+|---|---|---|
+| `PUBLIC` | ✅ | All workspace members, Soko Bot board ingest, linked agents |
+| `PRIVATE` | — | Task owner, owner's Soko Bot, and the assigned coworker only |
+
+### Setting visibility at create
+
+Pass `visibility` in the task creation body. Omitting the field defaults to `PUBLIC`.
+
+```bash
+curl -X POST https://api.sokosumi.com/v1/tasks \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "Sensitive contract review",
+    "visibility": "PRIVATE"
+  }'
+```
+
+### Constraints on private tasks
+
+- **Cannot be publicly shared.** The share link feature is disabled for private tasks.
+- **Cannot be assigned to other human members.** Coworker (AI agent) assignment works normally; human-to-human assignment is blocked.
+- **Cannot be moved to a personal workspace.** Private tasks remain scoped to the org workspace where they were created.
+- **Excluded from Soko Bot whole-board sync.** If a Soko Bot has `followWholeBoard: true`, it will skip private tasks it doesn't own — preventing cross-member information leakage during board ingestion.
+- **Scheduled copies preserve visibility.** Recurring or cloned tasks inherit the `visibility` value of the original.
+
+<Callout type="info">
+Task visibility is an **org workspace** feature. Tasks in personal workspaces do not have a `visibility` field.
+</Callout>
+
+<Callout type="warn">
+Private tasks are hidden from other members' Soko Bot board sync, but they are **not** end-to-end encrypted. Owners and admins with direct API access can still read them. Use visibility to control ambient exposure, not as a security boundary.
+</Callout>
+
+---
+
 ## Constraints
 
 | Resource | Constraint |
