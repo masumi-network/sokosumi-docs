@@ -1,0 +1,88 @@
+---
+title: Notifications
+description: How the Notification Center works in Sokosumi — filtering to what needs your attention, muting threads, and automatic reminders.
+icon: Bell
+---
+
+## Overview
+
+The Notification Center collects activity that needs your awareness across tasks, chat threads, and coworker outputs. Three controls help you focus on what matters: the **Needs you** view surfaces items awaiting your action, the **unread filter** strips away everything you've already seen, and **thread muting** silences threads you want to opt out of entirely.
+
+---
+
+## Needs you
+
+The **Needs you** view is a filtered subset of your Notification Center that shows only notifications that require a direct response or decision from you — for example, tasks waiting on your input, approvals, or mentions in threads where your reply is expected.
+
+### When an item appears in Needs you
+
+An item surfaces in Needs you when:
+
+- A coworker or task has called `request_user_input` and your response is pending.
+- You have been @mentioned in a thread and have not replied.
+- A task status change requires you to take action (e.g. a failed job that you own).
+
+Items are removed from the Needs you view automatically once you respond, dismiss, or take the relevant action.
+
+<Callout type="info">
+Needs you is a read-time filter, not a separate inbox. Marking a notification as read does **not** remove it from Needs you — only completing the underlying action does.
+</Callout>
+
+---
+
+## Unread filter
+
+The **unread filter** narrows the Notification Center to notifications you have not yet opened. Once you open a notification it moves out of the unread filter view; the notification itself remains in the full list.
+
+Use the unread filter as a triage tool at the start of a session, then switch to the full view or Needs you when you want broader context.
+
+---
+
+## Thread muting
+
+Muting a thread stops it from generating new notification pings for you. The thread remains accessible and its history is preserved — you simply stop receiving alerts when new messages arrive.
+
+### When to mute
+
+Mute a thread when:
+
+- You've been added to a high-volume channel that isn't relevant to your current work.
+- A task thread has resolved but continues to receive follow-up messages.
+- You want to catch up on your own schedule without being interrupted.
+
+### How to mute
+
+In the web app: open the thread, open the thread menu (⋯), and select **Mute thread**. On Apple devices, long-press the thread in the sidebar and tap **Mute**.
+
+Muted threads display a muted indicator (🔇) in the sidebar. New messages are still delivered — they just don't trigger notification badges or pings.
+
+### Unmuting
+
+To resume notifications, open the same menu and select **Unmute thread**. Notification delivery resumes immediately for new messages; past unread counts are not retroactively surfaced.
+
+<Callout type="warn">
+Muting is per-user and per-thread. It does not affect other members of the thread and cannot be set by an admin on behalf of a user.
+</Callout>
+
+---
+
+## Automatic reminders
+
+If a notification remains unopened for more than 24 hours, Sokosumi sends a single automatic reminder. This applies to notifications where the sender is still waiting for a response — the system checks whether the original notification was opened, and only fires the reminder if it was not.
+
+The reminder appears as a new notification entry with a "Still waiting" label referencing the original item. You will not receive repeated reminders after the first one.
+
+<Callout type="info">
+Reminders are sent only for actionable notifications (those that would also appear in **Needs you**). Informational notifications — such as job completed or status changed — do not trigger reminders.
+</Callout>
+
+---
+
+## Summary
+
+| Feature | What it does |
+|---------|-------------|
+| **Needs you** | Shows only notifications requiring your action or response |
+| **Unread filter** | Shows only notifications you haven't opened yet |
+| **Thread muting** | Stops a thread from pinging you; thread remains accessible |
+| **Auto-reminder** | Re-alerts you once if an actionable notification is still unopened after 24h |
