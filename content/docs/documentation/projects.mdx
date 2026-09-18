@@ -137,3 +137,161 @@ Response:
 | `DELETE` | `/v1/projects/{id}/tasks/{taskId}` | Unassign a task |
 
 All endpoints require **user authentication** and an active **workspace context**.
+
+---
+
+## Social Account Connections (Beta)
+
+<Callout type="warning">
+**Beta access required.** Social Account Connections are currently available only to **utxo AG workspace members**. All social connection endpoints return `403` for any other workspace. The Social Media module tile shows "Coming soon" for non-beta users.
+</Callout>
+
+Projects can publish to external social platforms — currently **X (Twitter)** — by connecting a Social account. A **Project social connection** is the Project's authorization to publish through one X account, managed via OAuth through Composio.
+
+### Prerequisites
+
+The following environment variables must be set on your Core instance before using the Social Connections API:
+
+| Variable | Description |
+|---|---|
+| `COMPOSIO_API_KEY` | API key for the Composio integration broker |
+| `COMPOSIO_X_AUTH_CONFIG_ID` | ID of your X OAuth auth config in Composio |
+
+If either is missing, all social connection endpoints return `503 Service Unavailable` with the message `"Integrations are not configured on this server."`.
+
+### Key concepts
+
+| Term | Definition |
+|---|---|
+| **Social account** | An external publishing identity on a social provider (e.g. an X account). May be connected to more than one Project. |
+| **Project social connection** | A Project's authorization to publish through one Social account. A Project may have multiple connections, including to different accounts on the same provider. |
+| **Reconnect** | Re-authorizing a connection with the **same** X account after it needs re-authentication. Cannot change the account identity. |
+| **Replace** | Explicitly disconnecting the current account and connecting a **different** one. |
+
+### Authentication requirement
+
+All social connection endpoints require an **interactive user session**. API keys and OAuth tokens are not accepted. Coworkers and orchestrators cannot manage social connections.
+
+### Connection lifecycle
+
+Connecting a Social account is a three-step OAuth popup flow:
+
+```
+POST /initiate  →  user authorizes in popup  →  POST /composio/callback/complete  →  POST /finalize
+```
+
+**Step 1 — Initiate:**
+
+```bash
+curl -X POST https://api.sokosumi.com/v1/projects/proj_abc123/social-connections/initiate \
+  -H "Authorization: Bearer SESSION_TOKEN" \
+  -H "x-organization-slug: your-workspace-slug" \
+  -H "Content-Type: application/json" \
+  -d '{"callbackUrl": "https://your-app.com/composio/callback"}'
+```
+
+Response (`201 Created`):
+
+```json
+{
+  "connectionId": "ca_xxx",
+  "redirectUrl": "https://connect.composio.dev/link-token/..."
+}
+```
+
+Open `redirectUrl` in a browser popup. After the user authorizes on X, the popup closes automatically.
+
+**Step 2 — Redeem the OAuth callback:**
+
+After the popup closes, your callback handler receives a `sessionUri`. Redeem it:
+
+```bash
+curl -X POST https://api.sokosumi.com/v1/composio/callback/complete \
+  -H "Authorization: Bearer SESSION_TOKEN" \
+  -H "x-organization-slug: your-workspace-slug" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "connectionId": "ca_xxx",
+    "sessionUri": "<session-uri-from-callback>"
+  }'
+```
+
+**Step 3 — Finalize the connection:**
+
+```bash
+curl -X POST https://api.sokosumi.com/v1/projects/proj_abc123/social-connections/finalize \
+  -H "Authorization: Bearer SESSION_TOKEN" \
+  -H "x-organization-slug: your-workspace-slug" \
+  -H "Content-Type: application/json" \
+  -d '{"connectionId": "ca_xxx"}'
+```
+
+Response (`201 Created`):
+
+```json
+{
+  "id": "sc_yyy",
+  "projectId": "proj_abc123",
+  "provider": "x",
+  "status": "ACTIVE",
+  "handle": "your_x_handle",
+  "createdAt": "2026-09-18T10:00:00Z"
+}
+```
+
+### List connections
+
+```bash
+curl https://api.sokosumi.com/v1/projects/proj_abc123/social-connections \
+  -H "Authorization: Bearer SESSION_TOKEN" \
+  -H "x-organization-slug: your-workspace-slug"
+```
+
+Returns an array of all Social connections for the Project, including disconnected ones.
+
+### Disconnect a connection
+
+```bash
+curl -X DELETE https://api.sokosumi.com/v1/projects/proj_abc123/social-connections/sc_yyy \
+  -H "Authorization: Bearer SESSION_TOKEN" \
+  -H "x-organization-slug: your-workspace-slug"
+```
+
+The revocation is forwarded to Composio. A revocation failure at the provider level is logged but does not cause the endpoint to fail — the connection is marked `DISCONNECTED` in Sokosumi regardless.
+
+### Reconnect vs Replace
+
+| Scenario | Flow |
+|---|---|
+| **Reconnect** (same account) | Initiate → OAuth → Finalize. The same X identity must authorize. Attempting reconnect with a different X account returns `409 Conflict`. |
+| **Replace** (different account) | Disconnect the existing connection first, then run the full initiate → OAuth → finalize flow with the new account. |
+
+### Popup edge cases
+
+| Situation | Outcome |
+|---|---|
+| Browser blocks popups | `"Your browser blocked the X authorization window."` |
+| User closes popup before completing OAuth | `400 Bad Request` — `"Unable to verify the OAuth callback."` |
+| Same X account connected twice | `409 Conflict` — `"already connected to this project"` |
+| Reconnect with different account | `409 Conflict` — `"Reconnect the same X account that is already linked to this project."` |
+
+### Error reference
+
+| Status | Cause |
+|---|---|
+| `400` | OAuth callback could not be verified (e.g. popup closed before authorization) |
+| `403` | Not a beta workspace member, or non-interactive auth method |
+| `409` | Duplicate connection or reconnect identity mismatch |
+| `503` | Composio not configured (`COMPOSIO_API_KEY` / `COMPOSIO_X_AUTH_CONFIG_ID` missing) or Composio API unavailable |
+
+### Social connections API summary
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/v1/projects/{id}/social-connections` | List a Project's Social connections |
+| `POST` | `/v1/projects/{id}/social-connections/initiate` | Begin an X OAuth flow |
+| `POST` | `/v1/projects/{id}/social-connections/finalize` | Finalize after OAuth callback |
+| `DELETE` | `/v1/projects/{id}/social-connections/{connectionId}` | Disconnect a Social account |
+| `POST` | `/v1/composio/callback/complete` | Redeem the OAuth callback session (interactive session only) |
+
+All social connection endpoints require an **interactive user session** and **Calendar beta workspace membership**.
