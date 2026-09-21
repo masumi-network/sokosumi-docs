@@ -1,0 +1,74 @@
+---
+title: Billing Notifications
+description: Stay informed about credit usage and payment events through Sokosumi's notification system.
+icon: Bell
+---
+
+## Overview
+
+Sokosumi's billing notification system keeps you informed about credit and payment activity across your workspace. When a billing event occurs — a credit balance change, an incoming payment, or a wallet action awaiting your response — Sokosumi routes a notification to your notification center and, when you're away from the app, to your email.
+
+---
+
+## Notification preference matrix
+
+You control which billing events trigger notifications through the **Notification Preferences** matrix in your account settings. Billing events appear in their own section of the matrix alongside other notification categories.
+
+Available billing rows:
+
+| Event | Description |
+|---|---|
+| Credits received | A credit top-up or subscription renewal was applied to your account |
+| Payment received | An incoming payment was settled to your wallet |
+| Wallet action required | A wallet transaction is waiting on your approval or response |
+
+Toggle each row to enable or disable in-app and email delivery independently.
+
+---
+
+## Delivery channels
+
+### In-app
+
+Billing notifications appear in the **notification bell** in the top navigation bar. Clicking a billing notification opens the relevant tab in the [Billing page](https://app.sokosumi.com/billing) directly — for example, a credit event opens **Billing → Credits**, and a payment event opens **Billing → Payments**.
+
+Unread billing notifications are counted in the bell badge alongside other notification types.
+
+### Email
+
+When Sokosumi detects that you are not actively viewing the app, billing notifications are also sent to your registered email address. The system uses realtime presence to determine whether you're looking at the app — if the app is in the foreground, the email is suppressed to avoid duplicates.
+
+<Callout type="info">
+Email notifications are only sent for events you have enabled in the preference matrix. Disabling a row suppresses both in-app and email delivery for that event type.
+</Callout>
+
+---
+
+## Wallet-pending reminders
+
+If a wallet transaction is waiting on your action — for example, a pending payment that requires confirmation before it can settle — Sokosumi sends a persistent reminder notification until the action is completed or the transaction expires. These reminders appear in the notification center and trigger email delivery if you are not actively viewing the app.
+
+---
+
+## Managing your preferences
+
+To update which billing events notify you:
+
+1. Open **Account Settings** (avatar menu → Settings)
+2. Navigate to **Notifications → Preference matrix**
+3. Locate the **Billing** section
+4. Toggle each event row to enable or disable in-app and email delivery
+
+Changes take effect immediately — no save step required.
+
+<Callout type="info">
+Notification preferences are per-user. Workspace admins cannot override individual members' billing notification settings.
+</Callout>
+
+---
+
+## Related
+
+- [Credits & Billing](/documentation) — overview of subscription credits, extra credits, and low-balance notices
+- [Notification Center](/documentation/notifications) — full guide to in-app notifications, the unread filter, and thread muting
+- [Organization Management](/documentation/organization) — workspace-level billing for Enterprise plans
