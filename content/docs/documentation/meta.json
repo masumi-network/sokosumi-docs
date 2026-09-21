@@ -5,6 +5,7 @@
   "pages": [
     "index",
     "projects",
+    "billing-notifications",
     "history",
     "coworkers",
     "image-generation",
