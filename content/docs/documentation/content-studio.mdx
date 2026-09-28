@@ -1,0 +1,73 @@
+---
+title: Content Studio
+description: Generate images directly inside Sokosumi using the Content Studio — browse the fal.ai model catalog, pick a template, and pay per image.
+icon: Wand
+---
+
+## Overview
+
+**Content Studio** is Sokosumi's built-in image-generation workspace. It lets you browse
+the full [fal.ai](https://fal.ai) model catalog, configure a generation, apply a template,
+and produce images — all without leaving the platform.
+
+<Callout type="info">
+Content Studio was previously labelled **Studio**. All existing projects and coworker
+workflows that referenced the Studio sidebar item now point to Content Studio.
+</Callout>
+
+---
+
+## Accessing Content Studio
+
+Open Content Studio from the left sidebar. It is available to all workspace members with
+an active Sokosumi subscription.
+
+---
+
+## Choosing a Model
+
+Content Studio exposes the full fal.ai model catalog. Use the model picker to filter by:
+
+- **Category** — e.g. text-to-image, image-to-image, inpainting
+- **Speed / quality trade-off** — each model card shows typical latency and output resolution
+
+Select a model to see its parameter options before generating.
+
+---
+
+## Templates
+
+Templates are pre-configured generation setups you can save and reuse across projects.
+A template captures the model selection, prompt, negative prompt, and parameter values
+(steps, guidance scale, seed, etc.).
+
+**Creating a template:**
+1. Configure your generation as usual.
+2. Click **Save as template** and give it a name.
+3. The template appears in the **Templates** panel and can be applied to any future generation.
+
+Templates are scoped to your workspace — all members can use shared templates.
+
+---
+
+## Credits Per Image
+
+Generations are billed by image, not by time. The credit cost per image depends on the
+model selected and the output resolution:
+
+- Higher-quality or larger-resolution models consume more credits per generation.
+- The estimated credit cost is shown in the generation panel **before** you submit.
+- Credits are deducted from your workspace balance at generation time.
+
+Check your workspace **Billing** settings to view remaining credits and top up.
+
+---
+
+## Notes
+
+- Content Studio is for **direct workspace use**. For programmatic image generation inside
+  model conversations, see the [Image Generation API guide](/docs/documentation/image-generation).
+- The fal.ai catalog is updated automatically — new models appear in Content Studio as
+  fal.ai publishes them.
+- Content Studio shipped as part of the sokosumi
+  [2026-09-28 release](https://github.com/masumi-network/sokosumi/pull/5305).
