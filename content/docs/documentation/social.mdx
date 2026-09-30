@@ -1,0 +1,88 @@
+---
+title: Social
+description: Create, schedule, and publish posts to X, YouTube, and LinkedIn from the Sokosumi Social calendar.
+icon: Share2
+---
+
+## Overview
+
+The **Social** page lets you manage social media content across connected accounts without leaving Sokosumi. It is split into three tabs:
+
+| Tab | Purpose |
+|-----|---------|
+| **Calendar** | View scheduled and published posts in a month-view calendar |
+| **Drafts** | Review, edit, and publish saved post drafts |
+| **Accounts** | Connect and manage X, YouTube, and LinkedIn accounts |
+
+Social is accessible from the main sidebar on desktop and from the **You** menu in the bottom navigation bar on mobile.
+
+---
+
+## Connecting accounts
+
+Before you can post, connect at least one social account. Open the **Accounts** tab — Sokosumi leads with **X, YouTube, and LinkedIn** as the primary connection options.
+
+Each platform uses OAuth: you are redirected to the platform's authorization page and returned to Sokosumi after granting access. Connected accounts appear in the Accounts tab with connection status and a disconnect option.
+
+<Callout type="info">
+X (formerly Twitter) OAuth setup is covered in detail in the [Social Account Connections guide](/docs/documentation/social-account-connections).
+</Callout>
+
+---
+
+## Creating a post
+
+Click **New post** from anywhere on the Social page to open the composer.
+
+### Choosing where the post goes
+
+The first control in the composer is the **destination picker** — choose which connected account(s) the post will go to. Setting the destination upfront lets you tailor the copy for the platform before you start writing.
+
+### Post types
+
+| Type | Description |
+|------|-------------|
+| **Manual post** | You write the content yourself |
+| **AI-generated** | A coworker drafts the post; you review and approve before publishing |
+
+<Callout type="info">
+"Write it myself" was renamed to **Manual post** in the September 2026 update ([sokosumi#5422](https://github.com/masumi-network/sokosumi/pull/5422)).
+</Callout>
+
+### Scheduling
+
+Toggle between **Publish now** and **Schedule for later**. When scheduling:
+
+- Date and time pickers let you set the exact publish time
+- The composer displays the **timezone** the schedule uses — no guessing required
+
+---
+
+## Calendar tab
+
+The calendar opens in **month view** by default, giving you a full picture of upcoming and recent posts at a glance. Each entry appears on its scheduled date; click a post to preview, edit, or reschedule it.
+
+---
+
+## Drafts tab
+
+Posts saved without publishing land in **Drafts**. From the Drafts tab you can:
+
+- Edit copy or change the destination account
+- Publish immediately or schedule for a future time
+- Delete drafts you no longer need
+
+---
+
+## Mobile
+
+Social is available on mobile via the **You** menu in the bottom navigation bar ([sokosumi#5455](https://github.com/masumi-network/sokosumi/pull/5455)). The full composer, calendar, and account management are accessible on mobile.
+
+---
+
+## Notes
+
+- The Calendar / Drafts / Accounts tab structure shipped in [sokosumi#5423](https://github.com/masumi-network/sokosumi/pull/5423) (2026-09-30).
+- Account onboarding reordered to lead with X, YouTube, LinkedIn in [sokosumi#5424](https://github.com/masumi-network/sokosumi/pull/5424).
+- Post destination picker added at the top of the composer in [sokosumi#5425](https://github.com/masumi-network/sokosumi/pull/5425).
+- Calendar defaults to month view as of [sokosumi#5421](https://github.com/masumi-network/sokosumi/pull/5421).
