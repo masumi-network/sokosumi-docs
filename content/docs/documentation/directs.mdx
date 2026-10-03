@@ -1,0 +1,70 @@
+---
+title: Direct Messages
+description: Private conversations between workspace members, including read-only Direct access.
+icon: MessageSquare
+---
+
+## Overview
+
+Direct Messages (Directs) are private conversations between two or more workspace members. Unlike channel messages, Directs are not scoped to a project or channel — they live at the workspace level and are visible only to their participants.
+
+Directs are available on the Sokosumi web app and the native macOS client.
+
+---
+
+## Starting a Direct
+
+Open the **Directs** section in the left sidebar and click **New Direct**. Search for one or more workspace members and confirm. The conversation is created immediately — no invite acceptance is required.
+
+---
+
+## Read-only Directs
+
+A member can be added to a Direct in **read-only** mode. This is a view-only state: the member can read the conversation history and receive new messages, but cannot write to the thread.
+
+### What is restricted in read-only mode
+
+| Action | Available |
+|--------|-----------|
+| Read messages and history | ✓ |
+| Receive new messages | ✓ |
+| Read receipts tracked | ✓ |
+| Add a reaction | ✗ |
+| Quote a message | ✗ |
+| Reply in an empty thread | ✗ |
+| Post new messages | ✗ |
+
+<Callout type="info">
+Read receipts are still tracked in read-only Directs. On macOS, the client runs explicit read operations even when no app window is active, so senders see accurate read status.
+</Callout>
+
+### How read-only access is assigned
+
+Read-only access is set by a workspace admin or the Direct owner when adding a participant. Existing participants cannot be demoted to read-only without removing and re-adding them.
+
+---
+
+## Managing channel members
+
+The **Members panel** in any channel lets you add and remove members directly without leaving the conversation. Open the panel from the channel header (`⌃M` on macOS, or the **Members** icon on web), then use the **Add members** action.
+
+<Callout type="info">
+Member management via the Members panel is available on both web and the macOS client. The web **Members action** (add/remove from within the panel) is rolling out progressively — if it is not yet visible in your workspace, use workspace Settings → Channels as a fallback.
+</Callout>
+
+---
+
+## Notifications and unread counts
+
+Directs follow the same notification rules as channels. You can mute a Direct from the conversation header or from **Notification preferences** in your workspace settings.
+
+Unread counts for Directs appear in the sidebar badge. On macOS, unread state is rechecked automatically after a period of inactivity so the badge stays accurate even after switching away from the app.
+
+---
+
+## Limitations
+
+- A Direct cannot be converted to a channel.
+- Files shared in a Direct are accessible only to participants.
+- Directs cannot be archived; they persist until all participants leave.
+- External guests cannot be added to Directs — only workspace members.
