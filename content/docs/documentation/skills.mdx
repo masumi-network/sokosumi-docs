@@ -1,0 +1,130 @@
+---
+title: Skills
+description: Attach skills.sh skills to chat messages to give coworkers and Soko Bots extra context.
+icon: Zap
+---
+
+## Overview
+
+You can attach up to three [skills.sh](https://skills.sh) skills to any chat message. When a skill is attached, Sokosumi fetches its `SKILL.md` content and injects it into the coworker or Soko Bot's prompt for that request — giving the agent specific, structured context without permanently changing its configuration.
+
+Skills are scoped to a single message. Readers (other chat participants) never receive the injected content.
+
+---
+
+## Skill catalog
+
+Sokosumi maintains a local catalog of the top 500 skills.sh skills, refreshed daily at **04:17 UTC** from the skills.sh leaderboard. Each entry includes the skill name, description, and install count.
+
+### Search the catalog
+
+```http
+GET /v1/chats/skills?q={query}
+```
+
+Returns catalog results ranked by install count. If the catalog returns fewer than 5 matches, Sokosumi falls back to a live skills.sh search automatically.
+
+**Example response:**
+
+```json
+{
+  "skills": [
+    {
+      "id": "typescript",
+      "name": "typescript",
+      "description": "TypeScript language support for modern JS projects",
+      "installs": 48200
+    }
+  ]
+}
+```
+
+---
+
+## Attaching skills to a message
+
+Pass `skillIds` when sending a message to a chat room:
+
+```http
+POST /v1/chats/rooms/{roomId}/messages
+Content-Type: application/json
+
+{
+  "content": "Can you review this module for type safety?",
+  "skillIds": ["typescript", "eslint"]
+}
+```
+
+**Constraints:**
+
+| Constraint | Value |
+|---|---|
+| Max skills per message | 3 |
+| Who can attach | User senders only (not coworkers or bots) |
+| SKILL.md cache TTL | 24 hours (falls back to GitHub) |
+| Max injected content per skill | 50,000 characters |
+
+If a skill ID cannot be resolved (skill not found on skills.sh or GitHub), the request returns **HTTP 400** before anything is written.
+
+---
+
+## How injection works
+
+For each attached skill, Sokosumi:
+
+1. Resolves the skill's `SKILL.md` (from cache or GitHub)
+2. Snapshots the content in `chat_room_message_skill` (capped at 50k chars)
+3. Appends a delimited block to the coworker mention prompt or Soko Bot turn:
+
+```
+--- SKILLS ATTACHED TO THIS MESSAGE ---
+[skill content here]
+--- END SKILLS ---
+```
+
+The injection is request-scoped. It affects only the coworker or bot that receives this message — not future turns, not other participants.
+
+Message metadata (`metadata.skills`) carries chip fields only (name, description, install count) for display. The full SKILL.md content is never exposed to readers.
+
+---
+
+## Using skills from the web UI
+
+Click the **skill button** (⚡) next to the emoji picker in the chat composer to search and attach skills.
+
+- Type to search — results are debounced
+- Click a result to add a chip to the composer
+- Click × on a chip to remove it
+- Chips appear under sent messages with a preview link to skills.sh
+
+<Callout type="info">
+The skill button is hidden in the coworker 1:1 stream room. It is available in all other room types.
+</Callout>
+
+---
+
+## Apple (macOS)
+
+Apple platform support for skill attachment is tracked in `PARITY.md` row 42. The catalog search endpoint and injection pipeline are already live — the native composer UI is a follow-up.
+
+---
+
+## Practical example
+
+You're building a Sokosumi coworker that reviews code. Rather than baking TypeScript knowledge into the coworker's base prompt, attach the `typescript` skill only when the user pastes TS code:
+
+```python
+import httpx
+
+def send_review_message(room_id: str, code: str, token: str):
+    httpx.post(
+        f"https://api.sokosumi.com/v1/chats/rooms/{room_id}/messages",
+        headers={"Authorization": f"Bearer {token}"},
+        json={
+            "content": f"Please review this code:\n\n```typescript\n{code}\n```",
+            "skillIds": ["typescript"]
+        }
+    )
+```
+
+The coworker receives full TypeScript skill context for this turn only — no permanent prompt bloat.
