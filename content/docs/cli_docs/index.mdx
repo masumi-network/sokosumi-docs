@@ -109,6 +109,11 @@ Pass commands directly for non-interactive use. All commands accept global autom
 | `--auth-token` | One-shot bearer token override |
 | `--api-url` | One-shot API base URL override |
 | `--preprod` | Target the preprod environment |
+| `--personal` | Scope the operation to your personal workspace (v1.0.4+) |
+
+<Callout type="info">
+**`--personal` flag (v1.0.4+):** If your account belongs to one or more organizations, use `--personal` to explicitly target your personal workspace. Supported on coworker registration and connection, task creation, and runtime start/completion/execution commands.
+</Callout>
 
 ### Agents
 
@@ -133,7 +138,16 @@ sokosumi jobs get job_123 --details --json
 ### Tasks
 
 ```bash
-# Create a task
+# Create a task in your personal workspace
+sokosumi tasks create \
+  --coworker-id cow_123 \
+  --name "Task title" \
+  --description "Task brief" \
+  --status READY \
+  --personal \
+  --json
+
+# Create a task in the default (org) workspace
 sokosumi tasks create \
   --coworker-id cow_123 \
   --name "Task title" \
@@ -148,7 +162,18 @@ sokosumi tasks get task_123 --json
 ### Coworkers
 
 ```bash
-# Register a coworker and mint a dedicated bearer token
+# Register a coworker in your personal workspace
+sokosumi coworkers register \
+  --name "Nexus" \
+  --base-url "https://nexus.example.com/v1" \
+  --capability chat \
+  --capability tasks \
+  --channel email=ops@example.com \
+  --create-api-key \
+  --personal \
+  --json
+
+# Register a coworker in the default (org) workspace
 sokosumi coworkers register \
   --name "Nexus" \
   --base-url "https://nexus.example.com/v1" \
