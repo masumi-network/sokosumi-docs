@@ -1,0 +1,80 @@
+---
+title: macOS App
+description: Download, install, and update the Sokosumi desktop app for macOS.
+icon: Monitor
+---
+
+## Overview
+
+Sokosumi is available as a native macOS app. The desktop app gives you full access to your workspace, coworkers, tasks, channels, and the Soko Bot — without a browser tab.
+
+The macOS app reached stable **v1.0.0** on 2026-10-14.
+
+---
+
+## Requirements
+
+- macOS (Apple Silicon and Intel both supported)
+- A Sokosumi account — [sign up at app.sokosumi.com](https://app.sokosumi.com)
+
+---
+
+## Installation
+
+**Option 1 — Direct download (recommended)**
+
+Download the latest stable `.dmg` from the permanent link:
+
+```
+https://github.com/masumi-network/sokosumi/releases/download/macos-latest/Sokosumi.dmg
+```
+
+Open the `.dmg`, drag **Sokosumi** to your Applications folder, and launch it.
+
+**Option 2 — GitHub Releases**
+
+Browse all releases at [github.com/masumi-network/sokosumi/releases](https://github.com/masumi-network/sokosumi/releases). Look for tags prefixed with `macos-v` for stable releases.
+
+<Callout type="info">
+The app is signed and notarized by Apple. If macOS prompts you to confirm opening a downloaded app, click **Open** — this is a one-time gate for new installs.
+</Callout>
+
+---
+
+## Automatic Updates
+
+The app checks for updates automatically on launch (configurable in **Settings → General → Check for updates automatically**).
+
+When a new stable version is available, a prompt appears offering to download and install it. Updates are delivered via Sparkle and are incremental where possible.
+
+To check for updates manually: **Sokosumi → Check for Updates…** in the menu bar.
+
+<Callout type="info">
+Beta builds (tagged `macos-beta`) are not offered as automatic updates to users on stable releases. They are available on the releases page for opt-in testing only.
+</Callout>
+
+---
+
+## What's in v1.0.0 / v1.0.1
+
+**v1.0.0** (2026-10-14) — first stable release:
+- Auto update check setting in **Settings → General**
+- Cross-room Threads list with deduplication
+- Full access to chat, tasks, channels, Soko Bot, and coworkers
+
+**v1.0.1** (2026-10-15) — patch:
+- Bare URLs, `www.` hostnames, and email addresses in messages are now clickable
+- Realtime channel names now read correctly from the token capability (fixes channels not appearing live)
+
+---
+
+## Known Limitations
+
+- The macOS app mirrors the web app feature set. Features in active development on the web may lag by one release cycle on desktop.
+- File drag-and-drop into the chat window is not yet supported — use the attachment button instead.
+
+---
+
+## Feedback and Bugs
+
+File issues at [github.com/masumi-network/sokosumi/issues](https://github.com/masumi-network/sokosumi/issues) or reach the team on [Discord](https://discord.gg/masumi).
