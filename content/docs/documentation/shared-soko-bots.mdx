@@ -1,0 +1,112 @@
+---
+title: Shared Soko Bots
+description: Create, authorize, and manage shared AI bots across your Sokosumi workspace.
+icon: Bot
+---
+
+## Overview
+
+Soko Bots are workspace-level AI assistants that any authorized member of your organization can interact with. Unlike [Hermes](/docs/documentation/hermes), which provisions a dedicated AI instance per user, Soko Bots are created by workspace owners and shared across the team.
+
+Shared Soko Bots shipped in **Sokosumi macOS v1.2.0** (October 2026).
+
+---
+
+## Soko Bots vs. Hermes
+
+| | Soko Bot | Hermes |
+|---|---|---|
+| Scope | Workspace-wide, shared | Personal, per-user |
+| Created by | Workspace owner | Auto-provisioned per user |
+| Billing | Billed to workspace | Per-user credits |
+| Chat access | Any authorized member | Individual user only |
+| Runtime | Shared | Dedicated microVM per user |
+
+---
+
+## Creating a Soko Bot
+
+Workspace owners can create Soko Bots from **Settings → Soko Bots → New Bot**.
+
+Configure:
+
+- **Name** — displayed to all workspace members in the bot picker
+- **Description** — what the bot does
+- **Scope** — which rooms or members can access it
+
+Once created, the bot appears in the chat picker for authorized members.
+
+---
+
+## Authorization and Scoping
+
+Each Soko Bot has an **owner scope** (the account that created it retains management rights). Access is configured per bot:
+
+- **Room membership** — connect the bot to specific rooms so it participates in those channels
+- **Member authorization** — grant or revoke individual members' access to chat with the bot
+
+This lets you create purpose-specific bots (e.g., an engineering bot in `#eng`, a sales bot in `#deals`) without exposing them workspace-wide.
+
+---
+
+## Connecting a Bot to a Room
+
+1. Open **Settings → Soko Bots**
+2. Select the bot
+3. Click **Connect to Room** and pick the target room
+
+The bot appears as a participant and can be @-mentioned directly in that room.
+
+---
+
+## Billing and Lifecycle
+
+Soko Bots are billed at the workspace level. Credit usage is attributed to the bot — not to individual members who interact with it.
+
+### Lifecycle states
+
+| State | Description |
+|---|---|
+| **Active** | Bot is live and available to authorized members |
+| **Connected** | Bot has active room memberships |
+| **Retired** | Bot is deactivated — no new interactions; room connections are removed |
+
+To retire a bot: **Settings → Soko Bots → [bot name] → Retire**.
+
+<Callout type="warn">
+Retiring a bot immediately disconnects it from all rooms. Message history is preserved, but no new interactions are possible. Retirement is permanent — create a new bot to restore the capability.
+</Callout>
+
+---
+
+## Chatting with a Soko Bot
+
+Authorized members can interact with a Soko Bot by:
+
+- **Selecting it in the chat picker** — listed alongside Hermes and registered coworkers
+- **@-mentioning it in a connected room** — the bot responds in-thread
+
+---
+
+## Web UI
+
+The **Settings → Soko Bots** page provides a full management view:
+
+- List all bots with their status and room connections
+- Create, edit, and retire bots
+- Manage room memberships and per-member authorization
+
+Non-owner members see a read-only view of bots they are authorized to use.
+
+---
+
+## Known Limitations
+
+- Shared Soko Bots require a workspace plan — not available in personal workspaces.
+- Credit reporting is workspace-level; per-member usage breakdowns are not yet available.
+
+---
+
+## Feedback
+
+Shared Soko Bots launched in v1.2.0. For issues or feedback, join [Discord](https://discord.gg/masumi) or file an issue on [GitHub](https://github.com/masumi-network/sokosumi-docs/issues).
