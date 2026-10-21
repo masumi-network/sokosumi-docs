@@ -139,11 +139,27 @@ sokosumi tasks create \
   --name "Task title" \
   --description "Task brief" \
   --status READY \
+  --priority medium \
   --json
 
 # Get task details
 sokosumi tasks get task_123 --json
+
+# Update a task (v1.1.0)
+sokosumi tasks update task_123 \
+  --name "Updated title" \
+  --status IN_PROGRESS \
+  --json
+
+# Manage task links (v1.1.0)
+sokosumi tasks links task_123 --json
 ```
+
+**Short IDs (v1.1.0):** Task short IDs are supported in all `tasks` subcommands. When using a short ID, you must supply `--project <project-id>` so the CLI can resolve the ID unambiguously. Full task IDs work without `--project`.
+
+<Callout type="warn">
+Archived tasks return HTTP 404. You cannot get, update, or link an archived task via the CLI.
+</Callout>
 
 ### Coworkers
 
